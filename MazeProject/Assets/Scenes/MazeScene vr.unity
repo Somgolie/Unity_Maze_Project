@@ -178,7 +178,7 @@ Transform:
   m_GameObject: {fileID: 228216271}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalPosition: {x: 0, y: 0.55, z: 0}
   m_LocalScale: {x: 0.5428587, y: 0.5227665, z: 0.4350285}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -200,7 +200,7 @@ MonoBehaviour:
   m_IsGlobal: 1
   priority: 0
   blendDistance: 0
-  weight: 1
+  weight: 0.9998
   sharedProfile: {fileID: 11400000, guid: 8e628d4ff5ad6c94c823f4bf79c42378, type: 2}
 --- !u!114 &228216274
 MonoBehaviour:
@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
   - component: {fileID: 330585549}
+  - component: {fileID: 330585550}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -266,7 +267,7 @@ Camera:
   m_ShutterSpeed: 0.005
   m_Aperture: 16
   m_FocusDistance: 10
-  m_FocalLength: 50
+  m_FocalLength: 14.174973
   m_BladeCount: 5
   m_Curvature: {x: 2, y: 11}
   m_BarrelClipping: 0.25
@@ -281,7 +282,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60
+  field of view: 80.5
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -391,6 +392,18 @@ MonoBehaviour:
   m_TrackingType: 0
   m_UpdateType: 0
   m_UseRelativeTransform: 0
+--- !u!114 &330585550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92f216369cb5be14dae4b7df06ebf115, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,6 +577,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FireExtinguisher (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a155447cdd8fd5443b4bfdc883c348dc, type: 3}
+      propertyPath: m_TagString
+      value: Respawn
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -670,6 +687,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FireExtinguisher
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a155447cdd8fd5443b4bfdc883c348dc, type: 3}
+      propertyPath: m_TagString
+      value: Respawn
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -720,6 +741,7 @@ GameObject:
   - component: {fileID: 1432503282}
   - component: {fileID: 1432503287}
   - component: {fileID: 1432503288}
+  - component: {fileID: 1432503289}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -743,8 +765,8 @@ CapsuleCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
@@ -812,7 +834,7 @@ Transform:
   m_GameObject: {fileID: 1432503281}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 58.39, y: 2.06, z: 59.01}
+  m_LocalPosition: {x: 47.16, y: 1.95, z: 49.35}
   m_LocalScale: {x: 1.8421, y: 1.9129, z: 2.2987}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -828,9 +850,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1432503281}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Mass: 1000
+  m_Drag: 105.04
+  m_AngularDrag: 273.5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -856,12 +878,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 1432503281}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4e801fd5cfdcd24c8ea1470880492e5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b29d915e2763754997ae636e8fcb5e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 6
-  movedrag: 4
-  orientation: {fileID: 1181207132}
+  moveSpeed: 2
+  rotationSpeed: 45
+  gravity: 9.81
+--- !u!143 &1432503289
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1432503281}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.9999999
+  m_Radius: 0.50000006
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1555541179
 GameObject:
   m_ObjectHideFlags: 0
@@ -875,7 +922,7 @@ GameObject:
   - component: {fileID: 1555541180}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -970,7 +1017,7 @@ GameObject:
   - component: {fileID: 2112460508}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
