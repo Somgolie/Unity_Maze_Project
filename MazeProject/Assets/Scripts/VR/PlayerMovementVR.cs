@@ -4,18 +4,28 @@ using UnityEngine.XR;
 
 public class PlayerMovementVR : MonoBehaviour
 {
-    public float moveSpeed = 2.0f;  // Speed of movement
-    public float rotationSpeed = 45.0f; // Speed of rotation
+    public float moveSpeed;  // Speed of movement
+    public float rotationSpeed; // Speed of rotation
     public float gravity = 9.81f; // Gravity strength
 
-    private CharacterController characterController;
+    private Rigidbody rb;
     private InputDevice leftController;
     private InputDevice rightController;
-    private float verticalVelocity = 0f;
 
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody component missing!");
+        }
+        else
+        {
+            rb.useGravity = false; // We handle gravity manually
+            rb.freezeRotation = true; // Prevents unwanted physics rotation
+        }
+
         InitializeControllers();
     }
 
@@ -49,9 +59,18 @@ public class PlayerMovementVR : MonoBehaviour
     {
         if (leftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 leftJoystickInput))
         {
-            Vector3 moveDirection = new Vector3(leftJoystickInput.x, 0, leftJoystickInput.y);
-            moveDirection = transform.TransformDirection(moveDirection);
-            characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+            Debug.Log("Left Joystick Input: " + leftJoystickInput);
+
+            if (leftJoystickInput.magnitude > 0.1f) // Ignore very small inputs
+            {
+                Vector3 moveDirection = new Vector3(leftJoystickInput.x, 0, leftJoystickInput.y);
+                moveDirection = transform.TransformDirection(moveDirection);
+                rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
+            }
+        }
+        else
+        {
+            Debug.LogError("Left joystick input not detected!");
         }
     }
 
@@ -65,23 +84,17 @@ public class PlayerMovementVR : MonoBehaviour
 
     void ApplyGravity()
     {
-        if (IsGrounded())
+        if (!IsGrounded())
         {
-            verticalVelocity = -0.1f; // Keep the player slightly on the ground
+            rb.linearVelocity += Vector3.down * gravity * Time.deltaTime;
         }
-        else
-        {
-            verticalVelocity -= gravity * Time.deltaTime;
-        }
-
-        characterController.Move(new Vector3(0, verticalVelocity * Time.deltaTime, 0));
     }
 
     bool IsGrounded()
     {
         RaycastHit hit;
         Vector3 rayOrigin = transform.position;
-        float rayDistance = characterController.height / 2 + 0.1f;
+        float rayDistance = 1.1f; // Adjust based on your player's height
 
         if (Physics.Raycast(rayOrigin, Vector3.down, out hit, rayDistance))
         {
