@@ -17,13 +17,17 @@ public class MazeGenerator : MonoBehaviour
 
     private MazeCell[,] _mazeGrid;
 
+    private int cellnumber;
     IEnumerator Start()
     {
+        cellnumber = 0;
         int counterx = 0;
 
         int counterz = 0; 
 
         _mazeGrid = new MazeCell[_mazeWidth, _mazeDepth];
+
+
 
         for (int x = 0; x < _mazeWidth; x++)
         {
@@ -32,7 +36,11 @@ public class MazeGenerator : MonoBehaviour
             for(int z = 0; z < _mazeDepth; z++)
             {
                 counterz++;
+                cellnumber++;
+
                 _mazeGrid[x,z] = Instantiate(_mazeCellPrefab, new Vector3(x,0, z), Quaternion.identity);
+                _mazeCellPrefab.cellNumber = cellnumber;
+
             }
         }
         yield return GenerateMaze(null, _mazeGrid[0, 0]);
@@ -41,6 +49,8 @@ public class MazeGenerator : MonoBehaviour
     //this method visits each maze cell
     private IEnumerator GenerateMaze(MazeCell previousCell, MazeCell currentCell)
     {
+ 
+
         currentCell.Visit();
         ClearWalls(previousCell, currentCell);
 
@@ -52,6 +62,7 @@ public class MazeGenerator : MonoBehaviour
             if (nextCell != null)
             {
                 yield return GenerateMaze(currentCell, nextCell);
+                
             }
         } while (nextCell != null);
     }
@@ -110,28 +121,45 @@ public class MazeGenerator : MonoBehaviour
         {
             return;
         }
+
         if (previousCell.transform.position.x < currentCell.transform.position.x)
         {
             previousCell.ClearRightWall();
             currentCell.ClearLeftWall();
+            if (currentCell.cellNumber==(_mazeDepth * _mazeWidth)-1)
+            {
+                currentCell.ClearRightWall();
+            }
             return;
         }
         if (previousCell.transform.position.x > currentCell.transform.position.x)
         {
             previousCell.ClearLeftWall();
             currentCell.ClearRightWall();
+            if (currentCell.cellNumber == (_mazeDepth * _mazeWidth)-1)
+            {
+                currentCell.ClearLeftWall();
+            }
             return;
         }
         if (previousCell.transform.position.z < currentCell.transform.position.z)
         {
             previousCell.ClearFrontWall();
             currentCell.ClearBackWall();
+            if (currentCell.cellNumber == (_mazeDepth * _mazeWidth)-1)
+            {
+                currentCell.ClearFrontWall();
+            }
             return;
         }
         if (previousCell.transform.position.z > currentCell.transform.position.z)
         {
             previousCell.ClearBackWall();
             currentCell.ClearFrontWall();
+            if (currentCell.cellNumber == (_mazeDepth * _mazeWidth)-1)
+            {
+                currentCell.ClearBackWall();
+            }
             return;
         }
     }

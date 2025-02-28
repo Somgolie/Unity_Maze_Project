@@ -6,6 +6,7 @@ public class Player_Movement : MonoBehaviour
 {
     public Camera MainCamera;
     public Camera DebugCamera;
+  
     public float moveSpeed = 10f;
     public float movedrag;
     public Transform orientation;
@@ -47,10 +48,12 @@ public class Player_Movement : MonoBehaviour
             if (MainCamera.enabled == true)
             {
                 ShowOverheadView();
+
             }
             if (MainCamera.enabled == false)
             {
                 ShowFirstPersonView();
+  
             }
         }
     }
