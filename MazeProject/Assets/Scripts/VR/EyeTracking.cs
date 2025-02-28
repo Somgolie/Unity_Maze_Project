@@ -25,28 +25,34 @@ public class EyeTracking : MonoBehaviour
 
     void TrackGaze()
     {
-        if (Varjo.XR.VarjoEyeTracking.IsGazeCalibrated())
+        if (VarjoEyeTracking.IsGazeCalibrated())
         {
             Debug.Log("Eye tracking is calibrated.");
-            Varjo.XR.VarjoEyeTracking.GazeData gazeData = VarjoEyeTracking.GetGaze();
+            VarjoEyeTracking.GazeData gazeData = VarjoEyeTracking.GetGaze();
 
             if (gazeData.status == VarjoEyeTracking.GazeStatus.Valid)
             {
                 Debug.Log("Gaze data is valid.");
+
+                // Get the camera's position and rotation
+                Vector3 cameraPosition = Camera.main.transform.position;
+                Quaternion cameraRotation = Camera.main.transform.rotation;
+
+                // Calculate the gaze direction using the eye tracking data
                 Vector3 gazeDirection = gazeData.gaze.forward;  // Direction in which the user is looking
-                Vector3 gazeOrigin = gazeData.gaze.origin;  // Position of the user's eye
+                Vector3 gazeOrigin = - gazeData.gaze.origin;  // Position of the user's eye
 
-                // Debugging the gaze direction and origin
-                Debug.Log("Gaze direction: " + gazeDirection);
-                Debug.Log("Gaze origin: " + gazeOrigin);
+                // Use the camera's rotation to adjust the gaze direction
+                Vector3 adjustedGazeDirection =  cameraRotation * - gazeDirection;
 
-                // Perform raycasting from the gaze origin in the direction of the gaze direction
+                // Visualize the raycast in the scene view using Debug.DrawRay
+                Debug.DrawRay(cameraPosition, adjustedGazeDirection * 10f, Color.red, 0.1f);
+
+                // Perform raycasting from the camera's position in the direction of the adjusted gaze direction
                 RaycastHit hit;
-                if (Physics.Raycast(gazeOrigin, gazeDirection, out hit))
+                if (Physics.Raycast(cameraPosition, adjustedGazeDirection, out hit))
                 {
-                    Debug.Log("Raycast hit something.");
                     string tag = hit.collider.tag;
-                    Debug.Log("Hit object tag: " + tag);
 
                     if (!string.IsNullOrEmpty(tag))
                     {
@@ -57,14 +63,12 @@ public class EyeTracking : MonoBehaviour
 
                         // Add the time the user spends looking at the object
                         gazeTimePerTag[tag] += Time.deltaTime;
-                        Debug.Log("Gaze time for tag " + tag + ": " + gazeTimePerTag[tag]);
                     }
                 }
                 else
                 {
                     // If the raycast doesn't hit anything, draw a debug ray
-                    Debug.Log("Raycast did not hit anything.");
-                    Debug.DrawRay(gazeOrigin, gazeDirection * 10f, Color.blue, 0.1f);
+                    Debug.DrawRay(cameraPosition, adjustedGazeDirection * 10f, Color.blue, 0.1f);
                 }
             }
             else
@@ -77,7 +81,6 @@ public class EyeTracking : MonoBehaviour
             Debug.Log("Eye tracking is not calibrated.");
         }
     }
-
 
     void OnApplicationQuit()
     {
@@ -97,7 +100,6 @@ public class EyeTracking : MonoBehaviour
     {
         using (StreamWriter writer = new StreamWriter(filePath, true))
         {
-            Debug.Log("Saving gaze data...");
             foreach (var entry in gazeTimePerTag)
             {
                 float percentage = (entry.Value / totalSessionTime) * 100f;

@@ -39,8 +39,21 @@ public class PlayerMovementVR : MonoBehaviour
         MovePlayer();
         RotatePlayer();
         ApplyGravity();
+        LockHeadTilt();
     }
+    void LockHeadTilt()
+    {
+        Transform cameraTransform = Camera.main.transform;
 
+        // Get the player's current rotation
+        Quaternion currentRotation = cameraTransform.rotation;
+
+        // Extract only the Yaw (Y-axis rotation) and Roll (Z-axis)
+        Vector3 euler = currentRotation.eulerAngles;
+
+        // Lock Pitch (X-axis) to 0, allowing only horizontal movement
+        cameraTransform.rotation = Quaternion.Euler(0, euler.y, 0);
+    }
     void InitializeControllers()
     {
         var inputDevices = new List<InputDevice>();
@@ -78,9 +91,15 @@ public class PlayerMovementVR : MonoBehaviour
     {
         if (rightController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 rightJoystickInput))
         {
-            transform.Rotate(Vector3.up, rightJoystickInput.x * rotationSpeed * Time.deltaTime);
+            float rotationAmount = rightJoystickInput.x * rotationSpeed * Time.deltaTime;
+            transform.Rotate(0, rotationAmount, 0, Space.World);
         }
+
+        // Lock X and Z rotation to prevent tilting
+        Vector3 eulerRotation = transform.eulerAngles;
+        transform.eulerAngles = new Vector3(0, eulerRotation.y, 0);
     }
+
 
     void ApplyGravity()
     {
