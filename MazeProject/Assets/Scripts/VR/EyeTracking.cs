@@ -33,12 +33,14 @@ public class EyeTracking : MonoBehaviour
             if (gazeData.status == VarjoEyeTracking.GazeStatus.Valid)
             {
                 Debug.Log("Gaze data is valid.");
-                Vector3 gazeDirection = gazeData.gaze.forward;
-                Vector3 gazeOrigin = gazeData.gaze.origin;
+                Vector3 gazeDirection = gazeData.gaze.forward;  // Direction in which the user is looking
+                Vector3 gazeOrigin = gazeData.gaze.origin;  // Position of the user's eye
 
+                // Debugging the gaze direction and origin
                 Debug.Log("Gaze direction: " + gazeDirection);
                 Debug.Log("Gaze origin: " + gazeOrigin);
 
+                // Perform raycasting from the gaze origin in the direction of the gaze direction
                 RaycastHit hit;
                 if (Physics.Raycast(gazeOrigin, gazeDirection, out hit))
                 {
@@ -48,19 +50,19 @@ public class EyeTracking : MonoBehaviour
 
                     if (!string.IsNullOrEmpty(tag))
                     {
-                        Debug.Log("Tag is not null or empty.");
                         if (!gazeTimePerTag.ContainsKey(tag))
                         {
-                            Debug.Log("Tag is new, adding to dictionary.");
                             gazeTimePerTag[tag] = 0f;
                         }
 
+                        // Add the time the user spends looking at the object
                         gazeTimePerTag[tag] += Time.deltaTime;
                         Debug.Log("Gaze time for tag " + tag + ": " + gazeTimePerTag[tag]);
                     }
                 }
                 else
                 {
+                    // If the raycast doesn't hit anything, draw a debug ray
                     Debug.Log("Raycast did not hit anything.");
                     Debug.DrawRay(gazeOrigin, gazeDirection * 10f, Color.blue, 0.1f);
                 }
@@ -75,6 +77,7 @@ public class EyeTracking : MonoBehaviour
             Debug.Log("Eye tracking is not calibrated.");
         }
     }
+
 
     void OnApplicationQuit()
     {
