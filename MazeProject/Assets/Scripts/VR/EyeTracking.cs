@@ -25,62 +25,63 @@ public class EyeTracking : MonoBehaviour
 
     void TrackGaze()
     {
-        if (VarjoEyeTracking.IsGazeCalibrated())
+        if (!VarjoEyeTracking.IsGazeAllowed())
         {
-            Debug.Log("Eye tracking is calibrated.");
-            VarjoEyeTracking.GazeData gazeData = VarjoEyeTracking.GetGaze();
+            Debug.LogWarning("Gaze tracking not allowed.");
+            return;
+        }
 
-            if (gazeData.status == VarjoEyeTracking.GazeStatus.Valid)
+        if (!VarjoEyeTracking.IsGazeCalibrated())
+        {
+            Debug.LogWarning("Eye tracking is not calibrated.");
+            return;
+        }
+
+        VarjoEyeTracking.GazeData gazeData = VarjoEyeTracking.GetGaze();
+
+        if (gazeData.status != VarjoEyeTracking.GazeStatus.Valid)
+        {
+            Debug.LogWarning("Invalid gaze data.");
+            return;
+        }
+
+        Debug.Log("Gaze data is valid.");
+
+        // Get the HMD (headset) transform
+        Transform hmdTransform = Camera.main.transform;
+
+        // Compute correct gaze origin & direction in world space
+        Vector3 gazeOrigin = hmdTransform.TransformPoint(gazeData.gaze.origin);
+        Vector3 gazeDirection = hmdTransform.TransformDirection(gazeData.gaze.forward);
+
+        // Visualize the gaze ray in Unity
+        Debug.DrawRay(gazeOrigin, gazeDirection * 10f, Color.green, 1f);
+
+        // Perform raycast from the gaze origin in the gaze direction
+        RaycastHit hit;
+        if (Physics.Raycast(gazeOrigin, gazeDirection, out hit))
+        {
+            string tag = hit.collider.tag;
+
+            if (!string.IsNullOrEmpty(tag))
             {
-                Debug.Log("Gaze data is valid.");
-
-                // Get the camera's position and rotation
-                Vector3 cameraPosition = Camera.main.transform.position;
-                Quaternion cameraRotation = Camera.main.transform.rotation;
-
-                // Calculate the gaze direction using the eye tracking data
-                Vector3 gazeDirection = gazeData.gaze.forward;  // Direction in which the user is looking
-                Vector3 gazeOrigin = - gazeData.gaze.origin;  // Position of the user's eye
-
-                // Use the camera's rotation to adjust the gaze direction
-                Vector3 adjustedGazeDirection =  cameraRotation * - gazeDirection;
-
-                // Visualize the raycast in the scene view using Debug.DrawRay
-                Debug.DrawRay(cameraPosition, adjustedGazeDirection * 10f, Color.red, 0.1f);
-
-                // Perform raycasting from the camera's position in the direction of the adjusted gaze direction
-                RaycastHit hit;
-                if (Physics.Raycast(cameraPosition, adjustedGazeDirection, out hit))
+                if (!gazeTimePerTag.ContainsKey(tag))
                 {
-                    string tag = hit.collider.tag;
-
-                    if (!string.IsNullOrEmpty(tag))
-                    {
-                        if (!gazeTimePerTag.ContainsKey(tag))
-                        {
-                            gazeTimePerTag[tag] = 0f;
-                        }
-
-                        // Add the time the user spends looking at the object
-                        gazeTimePerTag[tag] += Time.deltaTime;
-                    }
+                    gazeTimePerTag[tag] = 0f;
                 }
-                else
-                {
-                    // If the raycast doesn't hit anything, draw a debug ray
-                    Debug.DrawRay(cameraPosition, adjustedGazeDirection * 10f, Color.blue, 0.1f);
-                }
+
+                // Add the time the user spends looking at the object
+                gazeTimePerTag[tag] += Time.deltaTime;
             }
-            else
-            {
-                Debug.Log("Gaze data is not valid.");
-            }
+
+            Debug.Log($"Hit object: {hit.collider.gameObject.name} (Tag: {tag})");
         }
         else
         {
-            Debug.Log("Eye tracking is not calibrated.");
+            Debug.Log("No object hit by gaze ray.");
         }
     }
+
 
     void OnApplicationQuit()
     {

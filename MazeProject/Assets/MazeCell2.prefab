@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 5852969399634348454}
   m_Layer: 0
   m_Name: LeftWall
-  m_TagString: Untagged
+  m_TagString: MazeCell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -324,7 +324,7 @@ GameObject:
   - component: {fileID: 7710480910884413254}
   m_Layer: 0
   m_Name: RightWall
-  m_TagString: Untagged
+  m_TagString: MazeCell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -378,7 +378,7 @@ GameObject:
   - component: {fileID: 1149939581385307952}
   m_Layer: 0
   m_Name: FrontWall
-  m_TagString: Untagged
+  m_TagString: MazeCell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 3527029024486474177}
   m_Layer: 0
   m_Name: BackWall
-  m_TagString: Untagged
+  m_TagString: MazeCell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -486,7 +486,7 @@ GameObject:
   - component: {fileID: 8812782663572714481}
   m_Layer: 0
   m_Name: UnvisitedBlock
-  m_TagString: Untagged
+  m_TagString: MazeCell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
