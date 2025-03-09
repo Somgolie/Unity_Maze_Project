@@ -24,6 +24,9 @@ public class PlayerSpeedController : MonoBehaviour
     private bool isUIVisible = false;
     public float uiDistance = 1f; // Distance in front of the player
 
+    private InputDevice leftHandDevice;
+    private InputDevice rightHandDevice;
+
     void Start()
     {
         uiPanel.SetActive(false);
@@ -50,8 +53,11 @@ public class PlayerSpeedController : MonoBehaviour
 
     void HandleControllerInput()
     {
-        InputDevice rightHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        // Get the VR controllers
+        leftHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+        rightHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
 
+        // Handle UI visibility toggle
         if (rightHandDevice.isValid)
         {
             bool aButtonPressed;
@@ -64,13 +70,7 @@ public class PlayerSpeedController : MonoBehaviour
                 {
                     PositionUIInFrontOfPlayer();
                 }
-
-                Debug.Log("A button pressed. UI " + (isUIVisible ? "shown" : "hidden"));
             }
-        }
-        else
-        {
-            Debug.LogWarning("Right-hand controller not detected.");
         }
     }
 
@@ -78,10 +78,7 @@ public class PlayerSpeedController : MonoBehaviour
     {
         if (xrCamera != null && uiPanel != null)
         {
-            // Position UI 1 unit in front of the camera
             uiPanel.transform.position = xrCamera.transform.position + xrCamera.transform.forward * uiDistance;
-
-            // Make UI face the camera
             uiPanel.transform.LookAt(xrCamera.transform);
             uiPanel.transform.rotation = Quaternion.LookRotation(uiPanel.transform.position - xrCamera.transform.position);
         }
@@ -89,26 +86,19 @@ public class PlayerSpeedController : MonoBehaviour
 
     void DetectUIButtonPress()
     {
-        InputDevice rightHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-
         if (rightHandDevice.isValid)
         {
             bool triggerPressed;
             if (rightHandDevice.TryGetFeatureValue(CommonUsages.triggerButton, out triggerPressed) && triggerPressed)
             {
-                Debug.Log("Trigger button pressed. Checking for UI interaction...");
-
                 Ray ray = new Ray(xrCamera.transform.position, xrCamera.transform.forward);
                 RaycastHit hit;
 
                 if (Physics.Raycast(ray, out hit, 10f, uiLayerMask))
                 {
-                    Debug.Log("Hit UI element: " + hit.collider.name);
-
                     Button button = hit.collider.GetComponent<Button>();
                     if (button != null)
                     {
-                        Debug.Log("Pressing button: " + button.name);
                         button.onClick.Invoke(); // Simulate button click
                     }
                 }
@@ -146,6 +136,6 @@ public class PlayerSpeedController : MonoBehaviour
             movementSpeedText.text = movementSpeed.ToString("F1");
 
         if (rotationSpeedText != null)
-            rotationSpeedText.text =  rotationSpeed.ToString("F1");
+            rotationSpeedText.text = rotationSpeed.ToString("F1");
     }
 }
