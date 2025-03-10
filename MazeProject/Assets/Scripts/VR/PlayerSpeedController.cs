@@ -1,28 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.XR;
-using UnityEngine.EventSystems;
 
 public class PlayerSpeedController : MonoBehaviour
 {
-    public float movementSpeed = 5f;
-    public float rotationSpeed = 100f;
+    public int movementSpeed = 5;
+    public int rotationSpeed = 100;
 
     public GameObject uiPanel;
-    public TMP_Text movementSpeedText;
-    public TMP_Text rotationSpeedText;
+    public Text movementSpeedText;
+    public Text rotationSpeedText;
 
     public Button increaseMovementSpeedButton;
     public Button decreaseMovementSpeedButton;
     public Button increaseRotationSpeedButton;
     public Button decreaseRotationSpeedButton;
 
-    public Camera xrCamera; // Assign the VR camera
-    public LayerMask uiLayerMask; // Set this to UI in the inspector
+    public Slider movementSpeedSlider;
+    public Slider rotationSpeedSlider;
+
+    public Camera xrCamera;
+    public LayerMask uiLayerMask;
 
     private bool isUIVisible = false;
-    public float uiDistance = 1f; // Distance in front of the player
+    public float uiDistance = 1f;
 
     private InputDevice leftHandDevice;
     private InputDevice rightHandDevice;
@@ -30,12 +31,25 @@ public class PlayerSpeedController : MonoBehaviour
     void Start()
     {
         uiPanel.SetActive(false);
+        
+        // Setup slider ranges
+        movementSpeedSlider.minValue = 1;
+        movementSpeedSlider.maxValue = 10;
+        movementSpeedSlider.value = movementSpeed;
+
+        rotationSpeedSlider.minValue = 1;
+        rotationSpeedSlider.maxValue = 10;
+        rotationSpeedSlider.value = rotationSpeed / 10;
+        
         UpdateSpeedUI();
 
-        increaseMovementSpeedButton.onClick.AddListener(IncreaseMovementSpeed);
-        decreaseMovementSpeedButton.onClick.AddListener(DecreaseMovementSpeed);
-        increaseRotationSpeedButton.onClick.AddListener(IncreaseRotationSpeed);
-        decreaseRotationSpeedButton.onClick.AddListener(DecreaseRotationSpeed);
+        increaseMovementSpeedButton.onClick.AddListener(() => ChangeMovementSpeed(1));
+        decreaseMovementSpeedButton.onClick.AddListener(() => ChangeMovementSpeed(-1));
+        increaseRotationSpeedButton.onClick.AddListener(() => ChangeRotationSpeed(1));
+        decreaseRotationSpeedButton.onClick.AddListener(() => ChangeRotationSpeed(-1));
+
+        movementSpeedSlider.onValueChanged.AddListener(OnMovementSliderChanged);
+        rotationSpeedSlider.onValueChanged.AddListener(OnRotationSliderChanged);
     }
 
     void Update()
@@ -53,15 +67,12 @@ public class PlayerSpeedController : MonoBehaviour
 
     void HandleControllerInput()
     {
-        // Get the VR controllers
         leftHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
         rightHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
 
-        // Handle UI visibility toggle
         if (rightHandDevice.isValid)
         {
-            bool aButtonPressed;
-            if (rightHandDevice.TryGetFeatureValue(CommonUsages.primaryButton, out aButtonPressed) && aButtonPressed)
+            if (rightHandDevice.TryGetFeatureValue(CommonUsages.primaryButton, out bool aButtonPressed) && aButtonPressed)
             {
                 isUIVisible = !isUIVisible;
                 uiPanel.SetActive(isUIVisible);
@@ -88,54 +99,50 @@ public class PlayerSpeedController : MonoBehaviour
     {
         if (rightHandDevice.isValid)
         {
-            bool triggerPressed;
-            if (rightHandDevice.TryGetFeatureValue(CommonUsages.triggerButton, out triggerPressed) && triggerPressed)
+            if (rightHandDevice.TryGetFeatureValue(CommonUsages.triggerButton, out bool triggerPressed) && triggerPressed)
             {
                 Ray ray = new Ray(xrCamera.transform.position, xrCamera.transform.forward);
-                RaycastHit hit;
-
-                if (Physics.Raycast(ray, out hit, 10f, uiLayerMask))
+                if (Physics.Raycast(ray, out RaycastHit hit, 10f, uiLayerMask))
                 {
                     Button button = hit.collider.GetComponent<Button>();
                     if (button != null)
                     {
-                        button.onClick.Invoke(); // Simulate button click
+                        button.onClick.Invoke();
                     }
                 }
             }
         }
     }
 
-    void IncreaseMovementSpeed()
+    void ChangeMovementSpeed(int change)
     {
-        movementSpeed += 1f;
+        movementSpeed = Mathf.Clamp(movementSpeed + change, 1, 10);
+        movementSpeedSlider.value = movementSpeed;
         UpdateSpeedUI();
     }
 
-    void DecreaseMovementSpeed()
+    void ChangeRotationSpeed(int change)
     {
-        movementSpeed = Mathf.Max(1f, movementSpeed - 1f);
+        rotationSpeed = Mathf.Clamp(rotationSpeed + (change * 10), 10, 100);
+        rotationSpeedSlider.value = rotationSpeed / 10;
         UpdateSpeedUI();
     }
 
-    void IncreaseRotationSpeed()
+    void OnMovementSliderChanged(float value)
     {
-        rotationSpeed += 10f;
+        movementSpeed = Mathf.RoundToInt(value);
         UpdateSpeedUI();
     }
 
-    void DecreaseRotationSpeed()
+    void OnRotationSliderChanged(float value)
     {
-        rotationSpeed = Mathf.Max(10f, rotationSpeed - 10f);
+        rotationSpeed = Mathf.RoundToInt(value) * 10;
         UpdateSpeedUI();
     }
 
     void UpdateSpeedUI()
     {
-        if (movementSpeedText != null)
-            movementSpeedText.text = movementSpeed.ToString("F1");
-
-        if (rotationSpeedText != null)
-            rotationSpeedText.text = rotationSpeed.ToString("F1");
+        movementSpeedText.text = movementSpeed.ToString();
+        rotationSpeedText.text = rotationSpeed.ToString();
     }
 }
