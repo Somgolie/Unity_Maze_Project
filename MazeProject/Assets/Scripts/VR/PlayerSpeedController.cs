@@ -4,7 +4,7 @@ using UnityEngine.XR;
 
 public class PlayerSpeedController : MonoBehaviour
 {
-    public int movementSpeed = 5;
+    public int movementSpeed = 1;
     public int rotationSpeed = 100;
 
     public GameObject uiPanel;
@@ -45,8 +45,8 @@ public class PlayerSpeedController : MonoBehaviour
 
         increaseMovementSpeedButton.onClick.AddListener(() => ChangeMovementSpeed(1));
         decreaseMovementSpeedButton.onClick.AddListener(() => ChangeMovementSpeed(-1));
-        increaseRotationSpeedButton.onClick.AddListener(() => ChangeRotationSpeed(1));
-        decreaseRotationSpeedButton.onClick.AddListener(() => ChangeRotationSpeed(-1));
+        increaseRotationSpeedButton.onClick.AddListener(() => ChangeRotationSpeed(10));
+        decreaseRotationSpeedButton.onClick.AddListener(() => ChangeRotationSpeed(-10));
 
         movementSpeedSlider.onValueChanged.AddListener(OnMovementSliderChanged);
         rotationSpeedSlider.onValueChanged.AddListener(OnRotationSliderChanged);

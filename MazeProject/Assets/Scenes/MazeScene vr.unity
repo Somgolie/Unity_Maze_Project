@@ -3023,8 +3023,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18cad32deec5df4d8c4708db8d7a9cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
-  rotationSpeed: 100
+  movementSpeed: 1
+  rotationSpeed: 1
   uiPanel: {fileID: 64476697}
   movementSpeedText: {fileID: 88914534}
   rotationSpeedText: {fileID: 1767780086}
