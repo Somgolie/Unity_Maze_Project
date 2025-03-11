@@ -61,7 +61,7 @@ public class PlayerSpeedController : MonoBehaviour
         float moveVertical = Input.GetAxis("Vertical") * movementSpeed * Time.deltaTime;
         transform.Translate(moveHorizontal, 0f, moveVertical);
 
-        float rotationHorizontal = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+        float rotationHorizontal = Input.GetAxis("RightJoystickHorizontal") * rotationSpeed * Time.deltaTime;
         transform.Rotate(0f, rotationHorizontal, 0f);
     }
 
@@ -124,7 +124,7 @@ public class PlayerSpeedController : MonoBehaviour
     void ChangeRotationSpeed(int change)
     {
         rotationSpeed = Mathf.Clamp(rotationSpeed + (change * 10), 10, 100);
-        rotationSpeedSlider.value = rotationSpeed / 10;
+        rotationSpeedSlider.value = rotationSpeed / 100;
         UpdateSpeedUI();
     }
 
@@ -143,6 +143,6 @@ public class PlayerSpeedController : MonoBehaviour
     void UpdateSpeedUI()
     {
         movementSpeedText.text = movementSpeed.ToString();
-        rotationSpeedText.text = rotationSpeed.ToString();
+        rotationSpeedText.text = (rotationSpeed/10).ToString();
     }
 }
