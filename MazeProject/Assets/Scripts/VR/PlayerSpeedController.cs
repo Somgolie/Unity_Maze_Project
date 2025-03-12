@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR;
+using UnityEngine.InputSystem;
 
 public class PlayerSpeedController : MonoBehaviour
 {
     public int movementSpeed = 1;
-    public int rotationSpeed = 100;
+    public int rotationSpeed = 10; // Starts at 10, scales up to 100
 
     public GameObject uiPanel;
     public Text movementSpeedText;
@@ -25,22 +26,22 @@ public class PlayerSpeedController : MonoBehaviour
     private bool isUIVisible = false;
     public float uiDistance = 1f;
 
-    private InputDevice leftHandDevice;
-    private InputDevice rightHandDevice;
+    private UnityEngine.XR.InputDevice leftHandDevice;
+    private UnityEngine.XR.InputDevice rightHandDevice;
 
     void Start()
     {
         uiPanel.SetActive(false);
-        
-        // Setup slider ranges
+
+        // Set slider ranges
         movementSpeedSlider.minValue = 1;
         movementSpeedSlider.maxValue = 10;
         movementSpeedSlider.value = movementSpeed;
 
-        rotationSpeedSlider.minValue = 1;
+        rotationSpeedSlider.minValue = 1;  // UI always displays 1 - 10
         rotationSpeedSlider.maxValue = 10;
-        rotationSpeedSlider.value = rotationSpeed / 10;
-        
+        rotationSpeedSlider.value = ConvertRotationSpeedToUI(rotationSpeed);
+
         UpdateSpeedUI();
 
         increaseMovementSpeedButton.onClick.AddListener(() => ChangeMovementSpeed(1));
@@ -57,12 +58,13 @@ public class PlayerSpeedController : MonoBehaviour
         HandleControllerInput();
         DetectUIButtonPress();
 
+        // Player Movement Logic
         float moveHorizontal = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
         float moveVertical = Input.GetAxis("Vertical") * movementSpeed * Time.deltaTime;
         transform.Translate(moveHorizontal, 0f, moveVertical);
 
-        float rotationHorizontal = Input.GetAxis("RightJoystickHorizontal") * rotationSpeed * Time.deltaTime;
-        transform.Rotate(0f, rotationHorizontal, 0f);
+        // Player Rotation Logic with UI update
+        RotatePlayerWithUIUpdate();
     }
 
     void HandleControllerInput()
@@ -72,7 +74,7 @@ public class PlayerSpeedController : MonoBehaviour
 
         if (rightHandDevice.isValid)
         {
-            if (rightHandDevice.TryGetFeatureValue(CommonUsages.primaryButton, out bool aButtonPressed) && aButtonPressed)
+            if (rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primaryButton, out bool aButtonPressed) && aButtonPressed)
             {
                 isUIVisible = !isUIVisible;
                 uiPanel.SetActive(isUIVisible);
@@ -99,7 +101,7 @@ public class PlayerSpeedController : MonoBehaviour
     {
         if (rightHandDevice.isValid)
         {
-            if (rightHandDevice.TryGetFeatureValue(CommonUsages.triggerButton, out bool triggerPressed) && triggerPressed)
+            if (rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.triggerButton, out bool triggerPressed) && triggerPressed)
             {
                 Ray ray = new Ray(xrCamera.transform.position, xrCamera.transform.forward);
                 if (Physics.Raycast(ray, out RaycastHit hit, 10f, uiLayerMask))
@@ -123,8 +125,8 @@ public class PlayerSpeedController : MonoBehaviour
 
     void ChangeRotationSpeed(int change)
     {
-        rotationSpeed = Mathf.Clamp(rotationSpeed + (change * 10), 10, 100);
-        rotationSpeedSlider.value = rotationSpeed / 100;
+        rotationSpeed = Mathf.Clamp(rotationSpeed + change, 10, 100); // Updated range
+        rotationSpeedSlider.value = ConvertRotationSpeedToUI(rotationSpeed);
         UpdateSpeedUI();
     }
 
@@ -136,13 +138,47 @@ public class PlayerSpeedController : MonoBehaviour
 
     void OnRotationSliderChanged(float value)
     {
-        rotationSpeed = Mathf.RoundToInt(value) * 10;
+        rotationSpeed = ConvertUIToRotationSpeed(value);
         UpdateSpeedUI();
     }
 
     void UpdateSpeedUI()
     {
         movementSpeedText.text = movementSpeed.ToString();
-        rotationSpeedText.text = (rotationSpeed/10).ToString();
+        rotationSpeedText.text = ConvertRotationSpeedToUI(rotationSpeed).ToString(); // Display 1 - 10
+    }
+
+    // Convert 10-100 rotation speed to 1-10 for UI
+    float ConvertRotationSpeedToUI(int rotationSpeed)
+    {
+        return Mathf.Clamp((rotationSpeed - 10) / 10 + 1, 1, 10);
+    }
+
+    // Convert 1-10 UI values back to 10-100 rotation speed
+    int ConvertUIToRotationSpeed(float uiValue)
+    {
+        return Mathf.Clamp(((int)uiValue - 1) * 10 + 10, 10, 100);
+    }
+
+    // Function to rotate the player and update UI
+    void RotatePlayerWithUIUpdate()
+    {
+        // Get the joystick input for rotation (assuming the right joystick is used)
+        if (rightHandDevice.isValid && rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out Vector2 rightJoystickInput))
+        {
+            // Calculate rotation amount based on joystick input
+            float rotationAmount = rightJoystickInput.x * rotationSpeed * Time.deltaTime;
+
+            // Apply rotation to the player (rotation along the Y axis)
+            transform.Rotate(0, rotationAmount, 0, Space.World);
+        }
+
+        // Lock X and Z rotation to prevent tilting
+        Vector3 eulerRotation = transform.eulerAngles;
+        transform.eulerAngles = new Vector3(0, eulerRotation.y, 0);
+
+        // Update the UI dynamically with the current rotation speed
+        rotationSpeedSlider.value = ConvertRotationSpeedToUI(rotationSpeed);
+        rotationSpeedText.text = ConvertRotationSpeedToUI(rotationSpeed).ToString(); // Display from 1 - 10
     }
 }
