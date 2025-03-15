@@ -7,6 +7,9 @@ TagManager:
   - Ground
   - SecondaryCamera
   - Wall
+  - MazeCell
+  - Cheese
+  - WallTripWire
   layers:
   - Default
   - TransparentFX
