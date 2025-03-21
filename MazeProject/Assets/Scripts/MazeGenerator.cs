@@ -21,9 +21,7 @@ public class MazeGenerator : MonoBehaviour
     IEnumerator Start()
     {
         cellnumber = 0;
-        int counterx = 0;
 
-        int counterz = 0; 
 
         _mazeGrid = new MazeCell[_mazeWidth, _mazeDepth];
 

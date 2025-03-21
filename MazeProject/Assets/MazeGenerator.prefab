@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5408494001319195996
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5873783697463616793}
+  - component: {fileID: 5465923744028548189}
+  - component: {fileID: 3676140241656465670}
+  - component: {fileID: 4454418488633632464}
+  m_Layer: 0
+  m_Name: MazeGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5873783697463616793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5408494001319195996}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -47, y: 0, z: 8.66}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5465923744028548189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5408494001319195996}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 229821c9ec6fa6345995d1f525d6a987, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mazeCellPrefab: {fileID: 1100093442556719123, guid: 5003c47f6b8606d4ea1ca36f6eb036d4, type: 3}
+  _mazeWidth: 6
+  _mazeDepth: 6
+--- !u!114 &3676140241656465670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5408494001319195996}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2240bb611cf7a9346a62930f7252fee0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _wallPrefab: {fileID: 5636602529099673849, guid: 21a16456612cb1a4ba2047c92778588f, type: 3}
+  _CheeseTripWire: {fileID: 5369059568201298534, guid: fb2ee6420cbe21343a216b4c42a75c06, type: 3}
+  _WallTripWire: {fileID: 1737623268797498, guid: da8d450b3761ca64ead9031127a3e1bc, type: 3}
+  rockTexture: {fileID: 2100000, guid: 514fc2c22011baa4aa0e78c099973832, type: 2}
+  cheeseTexture: {fileID: 2100000, guid: 251ea5239266a6c4fa5d4336157c99dc, type: 2}
+  CheeseWire: {fileID: 2100000, guid: 251ea5239266a6c4fa5d4336157c99dc, type: 2}
+  WallWire: {fileID: 0}
+--- !u!114 &4454418488633632464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5408494001319195996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b79618c6adc7f749b426829a9f7366f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallFiles:
+  - {fileID: 4900000, guid: 203656ca18caddd48860bfe04f3ccbe6, type: 3}
+  - {fileID: 4900000, guid: 0f76fc51725ed454fa139dc590a12923, type: 3}
+  - {fileID: 4900000, guid: f499c4c5cc26ef0429bb06a83ede702e, type: 3}
+  - {fileID: 4900000, guid: a9b940ca2ce4ec94e922e9a2c760ca17, type: 3}
+  - {fileID: 4900000, guid: 43d9f705abb44d643adf11119b701b4a, type: 3}
+  _wallPrefab: {fileID: 5636602529099673849, guid: 21a16456612cb1a4ba2047c92778588f, type: 3}
+  _CheeseTripWire: {fileID: 5369059568201298534, guid: fb2ee6420cbe21343a216b4c42a75c06, type: 3}
+  _WallTripWire: {fileID: 1737623268797498, guid: da8d450b3761ca64ead9031127a3e1bc, type: 3}
+  rockTexture: {fileID: 2100000, guid: 514fc2c22011baa4aa0e78c099973832, type: 2}
+  cheeseTexture: {fileID: 2100000, guid: 251ea5239266a6c4fa5d4336157c99dc, type: 2}
+  CheeseWire: {fileID: 2100000, guid: 251ea5239266a6c4fa5d4336157c99dc, type: 2}
+  WallWire: {fileID: 2100000, guid: 1b0e640a4135d1d4fbf48166dbb28475, type: 2}
