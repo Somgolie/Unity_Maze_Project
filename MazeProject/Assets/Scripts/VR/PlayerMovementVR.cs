@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovementVR : MonoBehaviour
 {
-    public float moveSpeed;  // Speed of movement
-    public float rotationSpeed; // Speed of rotation
+    private float moveSpeed;
+    private float rotationSpeed;
     public float gravity = 9.81f; // Gravity strength
 
     private Rigidbody rb;
@@ -26,7 +27,21 @@ public class PlayerMovementVR : MonoBehaviour
             rb.freezeRotation = true; // Prevents unwanted physics rotation
         }
 
+        // Get values from EyeTrackingDataManager
+        moveSpeed = EyeTrackingDataManager.Instance != null ? EyeTrackingDataManager.Instance.LinearVelocity : 2.0f; // Default speed
+        rotationSpeed = EyeTrackingDataManager.Instance != null ? EyeTrackingDataManager.Instance.RotationalVelocity : 50.0f; // Default rotation
+
+        Debug.Log($"Loaded Linear Velocity: {moveSpeed}, Rotational Velocity: {rotationSpeed}");
+
         InitializeControllers();
+
+        // Listen for scene load to reset position
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        transform.position = new Vector3(1, 0.5f, 2);
     }
 
     void Update()
@@ -38,31 +53,24 @@ public class PlayerMovementVR : MonoBehaviour
 
         MovePlayer();
         RotatePlayer();
-        ApplyGravity();
         LockHeadTilt();
     }
+
     void LockHeadTilt()
     {
         Transform cameraTransform = Camera.main.transform;
-
-        // Get the player's current rotation
         Quaternion currentRotation = cameraTransform.rotation;
-
-        // Extract only the Yaw (Y-axis rotation) and Roll (Z-axis)
         Vector3 euler = currentRotation.eulerAngles;
-
-        // Lock Pitch (X-axis) to 0, allowing only horizontal movement
         cameraTransform.rotation = Quaternion.Euler(0, euler.y, 0);
     }
+
     void InitializeControllers()
     {
         var inputDevices = new List<InputDevice>();
 
-        // Get Left Hand Controller
         InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, inputDevices);
         if (inputDevices.Count > 0) leftController = inputDevices[0];
 
-        // Get Right Hand Controller
         inputDevices.Clear();
         InputDevices.GetDevicesAtXRNode(XRNode.RightHand, inputDevices);
         if (inputDevices.Count > 0) rightController = inputDevices[0];
@@ -72,18 +80,12 @@ public class PlayerMovementVR : MonoBehaviour
     {
         if (leftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 leftJoystickInput))
         {
-            Debug.Log("Left Joystick Input: " + leftJoystickInput);
-
-            if (leftJoystickInput.magnitude > 0.1f) // Ignore very small inputs
+            if (leftJoystickInput.magnitude > 0.1f)
             {
                 Vector3 moveDirection = new Vector3(leftJoystickInput.x, 0, leftJoystickInput.y);
                 moveDirection = transform.TransformDirection(moveDirection);
                 rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
             }
-        }
-        else
-        {
-            Debug.LogError("Left joystick input not detected!");
         }
     }
 
@@ -95,11 +97,9 @@ public class PlayerMovementVR : MonoBehaviour
             transform.Rotate(0, rotationAmount, 0, Space.World);
         }
 
-        // Lock X and Z rotation to prevent tilting
         Vector3 eulerRotation = transform.eulerAngles;
         transform.eulerAngles = new Vector3(0, eulerRotation.y, 0);
     }
-
 
     void ApplyGravity()
     {
@@ -113,7 +113,7 @@ public class PlayerMovementVR : MonoBehaviour
     {
         RaycastHit hit;
         Vector3 rayOrigin = transform.position;
-        float rayDistance = 1.1f; // Adjust based on your player's height
+        float rayDistance = 1.1f;
 
         if (Physics.Raycast(rayOrigin, Vector3.down, out hit, rayDistance))
         {
