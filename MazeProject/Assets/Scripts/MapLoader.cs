@@ -10,13 +10,15 @@ public class MapLoader : MonoBehaviour
         private TextAsset wallDataFile;  // Load the map file here*/
     [SerializeField]
     private List<TextAsset> wallFiles = new List<TextAsset>();  // Load multiple map files here
+
     [SerializeField]
     private GameObject _wallPrefab;
     [SerializeField]
     private GameObject _CheeseTripWire;
     [SerializeField]
     private GameObject _WallTripWire;
-
+    [SerializeField]
+    public ObjectSpawner spawner;
 
     public class Wall
     {
@@ -33,13 +35,99 @@ public class MapLoader : MonoBehaviour
     public Material CheeseWire;
     [SerializeField]
     public Material WallWire;
-
+    [SerializeField]
+    public GameObject[] modelPrefabs; // Array to hold references to the prefabs
     private int currentMazeIndex = -1;  // Start with no maze selected initially
     private HashSet<int> playedMazes = new HashSet<int>();  // To keep track of mazes that have been played
+    private bool readnext;
 
     public Dictionary<int, Wall> wallDictionary = new Dictionary<int, Wall>();
+    public Dictionary<int, Wall> ObjDictionary = new Dictionary<int, Wall>();
+    private int objCount;
 
- 
+    void LoadObjectData(TextAsset mapData)
+    {
+        Debug.Log("Load more objects  " + (modelPrefabs.Length));
+        float[] objArray = null;
+
+        using (StringReader reader = new StringReader(mapData.text))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line.StartsWith("#Peripheral"))
+                {
+                    Debug.Log("Peripheral:");
+                    readnext = true;
+                    objCount = 0;
+
+
+                    // Initialize objArray here to store 4 float values for the peripheral data
+                    objArray = new float[4];
+                    continue;  // Skip to the next line after initializing objArray
+                }
+
+                string[] values = line.Split(new char[] { '\t', ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+                try
+                {
+                    foreach (string v in values)
+                    {
+                        if (readnext == true)
+                        {
+                            if (objArray == null)
+                            {
+                                Debug.LogWarning("objArray was null. Initializing now.");
+                                objArray = new float[4];
+                            }
+                                if (objCount < 4)
+                            {
+                                objArray[objCount] = float.Parse(v);  // Parse string value into float and store in objArray
+
+                                objCount++;
+                            }
+                            else
+                            {
+                                if (objCount < 5)
+                                {
+                                    SpawnPeripheralObject(objArray[0], objArray[1], objArray[2], objArray[3], v);
+                                    objCount++;
+                                }
+                                    readnext = false;  // Stop reading after 4 values
+                            }
+                        }
+                    }
+                }
+                catch (FormatException ex)
+                {
+                    Debug.LogError($"Failed to parse line: {line} Error: {ex.Message}");
+                }
+            }
+        }
+    }
+
+    void SpawnPeripheralObject(float x, float y, float scale, float rotationAngle, string objFile)
+    {
+        Debug.Log(objFile);
+        Debug.Log(modelPrefabs.Length);
+
+        for (int i=0;i<modelPrefabs.Length;i++)
+        {
+            String target = modelPrefabs[i].name;
+
+            if ( (target+".obj") == objFile)
+            {
+                Debug.Log("FOUND");
+                Vector3 pos= new Vector3(x, 0f, y);
+
+                GameObject ObjectPrefab=Instantiate(modelPrefabs[i], pos, Quaternion.identity);
+                ObjectPrefab.transform.localScale = new Vector3(scale, scale, scale);
+                ObjectPrefab.tag = "Object";
+                return;
+            }
+        }
+        Debug.Log("NOT FOUND");
+
+    }
 
     void LoadWallData(TextAsset mapData)
     {
@@ -108,7 +196,7 @@ public class MapLoader : MonoBehaviour
                 return null;  // Or return a default material
         }
     }
-    private void Start()
+    public void Start()
     {
         LoadNewMaze();
     }
@@ -127,6 +215,7 @@ public class MapLoader : MonoBehaviour
         // Load the wall data for the selected maze
         TextAsset wallDataFile = wallFiles[nextMazeIndex];
         LoadWallData(wallDataFile);
+        LoadObjectData(wallDataFile);
 
         Debug.Log("Loaded " + wallDictionary.Count + " walls into the dictionary.");
 
@@ -134,7 +223,7 @@ public class MapLoader : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            player.transform.position = new Vector3(1f, 0f, 2f);
+            player.transform.position = new Vector3(1f, 0.7f, 2f);
         }
         else
         {
@@ -196,6 +285,7 @@ public class MapLoader : MonoBehaviour
         }*/
     public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
+
         // 1. Calculate midpoint in 3D
         Vector3 startPos = new Vector3(x1, 0f, y1);
         Vector3 endPos = new Vector3(x2, 0f, y2);
@@ -240,10 +330,14 @@ public class MapLoader : MonoBehaviour
             //Debug.LogError("Renderer not found on Wall(Clone)!");
         }
     }
+    public void buildObjects(float x1, float y1, float x2, float y2, Material TexMaterial)
+    {
+
+    }
     void DestroyExistingWalls()
     {
         // Delete all GameObjects with the tags "Wall", "Cheese", or "WallTripWire"
-        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire" };
+        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire" ,"Object"};
 
         foreach (string tag in tagsToDelete)
         {
@@ -258,6 +352,7 @@ public class MapLoader : MonoBehaviour
 
     public void LoadNextMaze()
     {
+
         // Debugging current maze index before incrementing
         Debug.Log("Current Maze Index: " + currentMazeIndex);
 
@@ -279,6 +374,7 @@ public class MapLoader : MonoBehaviour
 
         // Load the new maze's data and build the maze
         LoadNewMaze();
+
     }
 
     void Update()

@@ -4,13 +4,14 @@ using UnityEngine.SceneManagement; // Required for scene management
 public class LevelTrigger : MonoBehaviour
 {
 
-    [SerializeField] private MapLoader mapLoader; // Reference to MapLoader script
-    private void OnTriggerEnter(Collider other)
+    public MapLoader mapLoader; // Reference to MapLoader script
+    public void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player")) // Ensure the player has the correct tag
         {
             Debug.Log("Player touched the trigger!");
             mapLoader.LoadNewMaze();
+            
         }
     }
 
