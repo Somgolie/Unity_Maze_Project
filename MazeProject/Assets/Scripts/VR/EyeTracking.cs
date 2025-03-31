@@ -5,24 +5,36 @@ using Varjo.XR;
 
 public class EyeTracking : MonoBehaviour
 {
+    // Store gaze time and count per tag
     private Dictionary<string, float> gazeTimePerTag = new Dictionary<string, float>();
+    private Dictionary<string, int> gazeCountPerTag = new Dictionary<string, int>();
+
+    // Track the last gaze tag
+    private string lastGazeTag = "";
+
+    // Total session time and file path
     private float totalSessionTime = 0f;
     private string filePath;
 
+    // Default user name, can be set from EyeTrackingDataManager if available
+    private string userName = "DefaultUser";
+
+    // Called when the script starts
     void Start()
     {
-        filePath = Path.Combine(Application.persistentDataPath, "EyeTrackingData.csv");
-        Debug.Log("File path set to: " + filePath);
+        InitializeUserName();
+        InitializeFilePath();
         WriteCSVHeader();
     }
 
+    // Called every frame to update the gaze data
     void Update()
     {
         totalSessionTime += Time.deltaTime;
-        Debug.Log("Total session time: " + totalSessionTime);
         TrackGaze();
     }
 
+    // Track gaze and update gaze time and gaze count for each tag
     void TrackGaze()
     {
         if (!VarjoEyeTracking.IsGazeAllowed())
@@ -47,17 +59,14 @@ public class EyeTracking : MonoBehaviour
 
         Debug.Log("Gaze data is valid.");
 
-        // Get the HMD (headset) transform
+        // Get the gaze origin and direction in world space
         Transform hmdTransform = Camera.main.transform;
-
-        // Compute correct gaze origin & direction in world space
         Vector3 gazeOrigin = hmdTransform.TransformPoint(gazeData.gaze.origin);
         Vector3 gazeDirection = hmdTransform.TransformDirection(gazeData.gaze.forward);
 
-        // Visualize the gaze ray in Unity
         Debug.DrawRay(gazeOrigin, gazeDirection * 10f, Color.green, 1f);
 
-        // Perform raycast from the gaze origin in the gaze direction
+        // Cast a ray from the gaze and check for hit objects
         RaycastHit hit;
         if (Physics.Raycast(gazeOrigin, gazeDirection, out hit))
         {
@@ -65,16 +74,17 @@ public class EyeTracking : MonoBehaviour
 
             if (!string.IsNullOrEmpty(tag))
             {
-                if (!gazeTimePerTag.ContainsKey(tag))
-                {
-                    gazeTimePerTag[tag] = 0f;
-                }
+                // Update gaze time for the tag
+                UpdateGazeTime(tag);
 
-                // Add the time the user spends looking at the object
-                gazeTimePerTag[tag] += Time.deltaTime;
+                // Track the gaze count on new tag transitions
+                TrackGazeTransition(tag);
+
+                // Update the last gaze tag
+                lastGazeTag = tag;
+
+                Debug.Log($"Hit object: {hit.collider.gameObject.name} (Tag: {tag})");
             }
-
-            Debug.Log($"Hit object: {hit.collider.gameObject.name} (Tag: {tag})");
         }
         else
         {
@@ -82,32 +92,102 @@ public class EyeTracking : MonoBehaviour
         }
     }
 
-
-    void OnApplicationQuit()
+    // Update the total gaze time for the current tag
+    void UpdateGazeTime(string tag)
     {
-        SaveGazeData();
+        if (!gazeTimePerTag.ContainsKey(tag))
+        {
+            gazeTimePerTag[tag] = 0f;
+        }
+        gazeTimePerTag[tag] += Time.deltaTime;
     }
 
+    // Track gaze transition between tags
+    void TrackGazeTransition(string tag)
+    {
+        if (tag != lastGazeTag)
+        {
+            if (!gazeCountPerTag.ContainsKey(tag))
+            {
+                gazeCountPerTag[tag] = 0;
+            }
+            gazeCountPerTag[tag]++;
+        }
+    }
+
+    // Called when the application quits
+    void OnApplicationQuit()
+    {
+        SaveGazeDataToCSV("Maze1.txt"); // Replace with actual maze filename
+    }
+
+    // Initialize the file path for the CSV data
+    void InitializeFilePath()
+    {
+        filePath = Path.Combine(Application.persistentDataPath, $"{userName}_EyeTrackingData.csv");
+        Debug.Log("File path set to: " + filePath);
+    }
+
+    // Initialize the user's name if available
+    void InitializeUserName()
+    {
+        if (EyeTrackingDataManager.Instance != null && !string.IsNullOrEmpty(EyeTrackingDataManager.Instance.UserName))
+        {
+            userName = EyeTrackingDataManager.Instance.UserName;
+        }
+    }
+
+    // Write the CSV header at the beginning
     void WriteCSVHeader()
     {
         using (StreamWriter writer = new StreamWriter(filePath, false))
         {
-            writer.WriteLine("Tag,TotalTime(s),Percentage(%)");
+            writer.WriteLine("Tag,TotalTime(s),Percentage(%),GazeCount");
             Debug.Log("CSV header written.");
         }
     }
 
-    void SaveGazeData()
+    // Save the gaze data to a CSV file
+void SaveGazeDataToCSV(string mazeFileName)
+{
+    string csvFilePath = Path.Combine(Application.persistentDataPath, $"{userName}_EyeTrackingData.csv");
+
+    // Get all unique tags from objects in the scene
+    HashSet<string> allPossibleTags = new HashSet<string>();
+    foreach (GameObject obj in FindObjectsOfType<GameObject>())
     {
-        using (StreamWriter writer = new StreamWriter(filePath, true))
+        if (!string.IsNullOrEmpty(obj.tag) && obj.tag != "Untagged")
         {
-            foreach (var entry in gazeTimePerTag)
-            {
-                float percentage = (entry.Value / totalSessionTime) * 100f;
-                writer.WriteLine($"{entry.Key},{entry.Value:F2},{percentage:F2}");
-                Debug.Log($"Data for tag '{entry.Key}': Time = {entry.Value:F2}, Percentage = {percentage:F2} written to CSV.");
-            }
+            allPossibleTags.Add(obj.tag);
         }
-        Debug.Log("Eye tracking data saved at: " + filePath);
     }
+
+    using (StreamWriter writer = new StreamWriter(csvFilePath, true))
+    {
+        // Write the maze file name header
+        writer.WriteLine($"File: {mazeFileName}");
+
+        // Write gaze data for each tag, ensuring even unobserved tags are included
+        foreach (string tag in allPossibleTags)
+        {
+            if(tag != "MainCamera" && tag != "Player"){
+                float totalTime = gazeTimePerTag.ContainsKey(tag) ? gazeTimePerTag[tag] : 0f;
+                int gazeCount = gazeCountPerTag.ContainsKey(tag) ? gazeCountPerTag[tag] : 0;
+                float percentage = totalSessionTime > 0 ? (totalTime / totalSessionTime) * 100f : 0f;
+
+                writer.WriteLine($"{tag},{totalTime:F2},{percentage:F2},{gazeCount}");
+
+            }
+            
+        }
+
+        // Write the total session time
+        writer.WriteLine($"Total Time of session: {totalSessionTime:F2}s");
+
+        // Add a separator line between maze entries
+        writer.WriteLine();
+
+        Debug.Log($"Gaze data for {mazeFileName} saved to CSV.");
+    }
+}
 }
