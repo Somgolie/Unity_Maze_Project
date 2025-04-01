@@ -141,6 +141,21 @@ MonoBehaviour:
   - {fileID: 4900000, guid: f499c4c5cc26ef0429bb06a83ede702e, type: 3}
   - {fileID: 4900000, guid: a9b940ca2ce4ec94e922e9a2c760ca17, type: 3}
   - {fileID: 4900000, guid: 43d9f705abb44d643adf11119b701b4a, type: 3}
+  - {fileID: 4900000, guid: 7f3cbddde5296a342afc018c1a6732eb, type: 3}
+  - {fileID: 4900000, guid: 69a342d6994c4e34f837dd9fcb420358, type: 3}
+  - {fileID: 4900000, guid: ab907f8ac5c3963478034a6c8d859868, type: 3}
+  - {fileID: 4900000, guid: d3461948bd8b8b24a9894ddadf06c1a5, type: 3}
+  - {fileID: 4900000, guid: 7f008229a0122dd4d98d807e12cd0e20, type: 3}
+  - {fileID: 4900000, guid: 512949581bc3b96438b4d911ff9b9f14, type: 3}
+  - {fileID: 4900000, guid: 7e1d439e18d00eb4cae4e82424204ca5, type: 3}
+  - {fileID: 4900000, guid: 2c56fe7620f000341805888b9c521ce9, type: 3}
+  - {fileID: 4900000, guid: 02779ba8c486e9045a20092e1b744314, type: 3}
+  - {fileID: 4900000, guid: 8d03f2cf66bf6d74388861e7b6c54127, type: 3}
+  - {fileID: 4900000, guid: 73657ee4563e2834d99b65aa9550c73e, type: 3}
+  - {fileID: 4900000, guid: 80c7406d295a82644a8a508414887a02, type: 3}
+  - {fileID: 4900000, guid: af07d32cd8c267b4b9e7c46c35caecdd, type: 3}
+  - {fileID: 4900000, guid: a5bb03f7a5f4bf44db1e0dca598924cf, type: 3}
+  - {fileID: 4900000, guid: 2983139ebe5f7d9418b60250a939321b, type: 3}
   _wallPrefab: {fileID: 5636602529099673849, guid: 21a16456612cb1a4ba2047c92778588f, type: 3}
   _CheeseTripWire: {fileID: 5369059568201298534}
   _WallTripWire: {fileID: 1737623268797498, guid: da8d450b3761ca64ead9031127a3e1bc, type: 3}
