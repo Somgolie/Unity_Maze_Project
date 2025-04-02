@@ -9,7 +9,7 @@ public class MapLoader : MonoBehaviour
     /*    [SerializeField]
         private TextAsset wallDataFile;  // Load the map file here*/
     [SerializeField]
-    private List<TextAsset> wallFiles = new List<TextAsset>();  // Load multiple map files here
+    public List<TextAsset> wallFiles = new List<TextAsset>();  // Load multiple map files here
 
     [SerializeField]
     private GameObject _wallPrefab;
@@ -37,7 +37,7 @@ public class MapLoader : MonoBehaviour
     public Material WallWire;
     [SerializeField]
     public GameObject[] modelPrefabs; // Array to hold references to the prefabs
-    private int currentMazeIndex = -1;  // Start with no maze selected initially
+    public int currentMazeIndex = -1;  // Start with no maze selected initially
     private HashSet<int> playedMazes = new HashSet<int>();  // To keep track of mazes that have been played
     private bool readnext;
 
@@ -202,43 +202,47 @@ public class MapLoader : MonoBehaviour
     }
     public void LoadNewMaze()
     {
+        // Save the previous maze's data before loading a new one
+        if (currentMazeIndex != -1 && currentMazeIndex < wallFiles.Count)
+        {
+            string previousMazeFileName = wallFiles[currentMazeIndex].name;
+            EyeTracking eyeTracking = FindObjectOfType<EyeTracking>();
+            if (eyeTracking != null)
+            {
+                eyeTracking.SaveMazeData(previousMazeFileName);
+            }
+        }
+
         DestroyExistingWalls();
         wallDictionary.Clear();
+
         if (wallFiles.Count == 0)
         {
             Debug.LogError("No maze files available.");
             return;
         }
 
+        int previousMazeIndex = currentMazeIndex; // Store the current maze index before getting the new one
         int nextMazeIndex = GetRandomUnplayedMazeIndex();
 
-        // Load the wall data for the selected maze
+        // Load the new maze data
         TextAsset wallDataFile = wallFiles[nextMazeIndex];
         LoadWallData(wallDataFile);
         LoadObjectData(wallDataFile);
 
-        Debug.Log("Loaded " + wallDictionary.Count + " walls into the dictionary.");
-
-        // Place player at the origin (or desired spawn point)
+        // Reset player position and build walls
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             player.transform.position = new Vector3(1f, 0.7f, 2f);
         }
-        else
-        {
-            Debug.LogError("Player not found!");
-        }
 
-        // Build the walls for the maze
-        Debug.Log("Building maze number: " + nextMazeIndex);
         for (int i = 0; i < wallDictionary.Count; i++)
         {
             Wall currentWall = wallDictionary[i];
             BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
         }
-    }
-    // Selects a random unplayed maze index
+    }    
     int GetRandomUnplayedMazeIndex()
     {
         List<int> availableMazes = new List<int>();
