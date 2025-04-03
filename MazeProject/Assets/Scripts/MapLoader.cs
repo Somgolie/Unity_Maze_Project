@@ -37,12 +37,12 @@ public class MapLoader : MonoBehaviour
     public Material WallWire;
     [SerializeField]
     public GameObject[] modelPrefabs; // Array to hold references to the prefabs
-    private int currentMazeIndex = -1;  // Start with no maze selected initially
+    public int currentMazeIndex = -1;  // Start with no maze selected initially  //<-
 
     List<int> availableMazes = new List<int>();
     List<int> playedMazes = new List<int>();
     private bool readnext;
-
+    
     public Dictionary<int, Wall> wallDictionary = new Dictionary<int, Wall>();
     public Dictionary<int, Wall> ObjDictionary = new Dictionary<int, Wall>();
     private int objCount;
@@ -270,7 +270,10 @@ public class MapLoader : MonoBehaviour
             for (int i = 0; i < wallDictionary.Count; i++)
             {
                 Wall currentWall = wallDictionary[i];
-                BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
+
+                    BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
+        
+  
             }
         }
     }    
@@ -318,7 +321,8 @@ public class MapLoader : MonoBehaviour
             TextAsset currentMazeFile = wallFiles[currentMazeIndex];
             LoadWallData(currentMazeFile);
         }*/
-    public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
+
+        public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
 
         // 1. Calculate midpoint in 3D
@@ -332,20 +336,36 @@ public class MapLoader : MonoBehaviour
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
         // 3. Instantiate the wall
-        GameObject newWall = Instantiate(_wallPrefab, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-
-        // 4. Adjust the wall・s length
-        Vector3 scale = newWall.transform.localScale;
-        scale.x = length;  // Adjust the wall's scale
-        newWall.transform.localScale = scale;
-
-        if (TexMaterial == cheeseTexture)
+        if (TexMaterial != WallWire)
         {
-            GameObject Finishline = Instantiate(_CheeseTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-            Vector3 scale_cheese = Finishline.transform.localScale;
-            scale_cheese.x = length;
-            Finishline.transform.localScale = scale_cheese;
+            GameObject newWall = Instantiate(_wallPrefab, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
+            // 4. Adjust the wall・s length
+            Vector3 scale = newWall.transform.localScale;
+            scale.x = length;  // Adjust the wall's scale
+            newWall.transform.localScale = scale;
+
+            if (TexMaterial == cheeseTexture)
+            {
+                GameObject Finishline = Instantiate(_CheeseTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
+                Vector3 scale_cheese = Finishline.transform.localScale;
+                scale_cheese.x = length;
+                Finishline.transform.localScale = scale_cheese;
+            }
+            // Apply the material to the wall
+            Renderer wallRenderer = newWall.GetComponentInChildren<MeshRenderer>();
+            if (wallRenderer != null)
+            {
+                wallRenderer.material = TexMaterial;
+                //Debug.Log("Renderer is " + wallRenderer.material);
+            }
+            else
+            {
+                //Debug.LogError("Renderer not found on Wall(Clone)!");
+            }
         }
+
+
+
         if (TexMaterial == WallWire)
         {
             GameObject Trigger = Instantiate(_WallTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
@@ -353,17 +373,7 @@ public class MapLoader : MonoBehaviour
             scale_trip.x = length;
             Trigger.transform.localScale = scale_trip;
         }
-        // Apply the material to the wall
-        Renderer wallRenderer = newWall.GetComponentInChildren<MeshRenderer>();
-        if (wallRenderer != null)
-        {
-            wallRenderer.material = TexMaterial;
-            //Debug.Log("Renderer is " + wallRenderer.material);
-        }
-        else
-        {
-            //Debug.LogError("Renderer not found on Wall(Clone)!");
-        }
+
     }
     public void buildObjects(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
