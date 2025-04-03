@@ -9,7 +9,7 @@ public class MapLoader : MonoBehaviour
     /*    [SerializeField]
         private TextAsset wallDataFile;  // Load the map file here*/
     [SerializeField]
-    private List<TextAsset> wallFiles = new List<TextAsset>();  // Load multiple map files here
+    public List<TextAsset> wallFiles = new List<TextAsset>();  // Load multiple map files here
 
     [SerializeField]
     private GameObject _wallPrefab;
@@ -223,14 +223,27 @@ public class MapLoader : MonoBehaviour
     }
     public void LoadNewMaze()
     {
+        // Save the previous maze's data before loading a new one
+        if (currentMazeIndex != -1 && currentMazeIndex < wallFiles.Count)
+        {
+            string previousMazeFileName = wallFiles[currentMazeIndex].name;
+            EyeTracking eyeTracking = FindObjectOfType<EyeTracking>();
+            if (eyeTracking != null)
+            {
+                eyeTracking.SaveMazeData(previousMazeFileName);
+            }
+        }
+
         DestroyExistingWalls();
         wallDictionary.Clear();
+
         if (wallFiles.Count == 0)
         {
             Debug.LogError("No maze files available.");
             return;
         }
 
+        int previousMazeIndex = currentMazeIndex; // Store the current maze index before getting the new one
         int nextMazeIndex = GetRandomUnplayedMazeIndex();
         if (nextMazeIndex != -1)
         {
@@ -260,8 +273,7 @@ public class MapLoader : MonoBehaviour
                 BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
             }
         }
-    }
-    // Selects a random unplayed maze index
+    }    
     int GetRandomUnplayedMazeIndex()
     {
         List<int> availableMazes = new List<int>();
