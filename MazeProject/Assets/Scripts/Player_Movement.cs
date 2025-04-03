@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player_Movement : MonoBehaviour
 {
+    public MapLoader mapLoader;
     public Camera MainCamera;
     public Camera DebugCamera;
   
@@ -14,7 +15,8 @@ public class Player_Movement : MonoBehaviour
     float horizontalInput;
     float verticalInput;
 
-   
+    
+
 
     Vector3 movedirection;
 
@@ -34,11 +36,19 @@ public class Player_Movement : MonoBehaviour
     }
     private void Start()
     {
+        mapLoader.LoadNewMaze();
         ShowFirstPersonView();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
     }
-
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Cheese")) // Ensure the player has the correct tag
+        {
+            Debug.Log("Player touched the trigger!");
+            mapLoader.LoadNewMaze();
+        }
+    }
     private void Update()
     {
         MyInput();

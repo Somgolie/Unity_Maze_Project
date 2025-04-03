@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cabinent
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f3015bdeac6fec24797e4b77e87fafcf, type: 3}
+      propertyPath: m_TagString
+      value: cabinetObject
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

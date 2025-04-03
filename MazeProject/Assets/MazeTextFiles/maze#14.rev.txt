@@ -30,8 +30,8 @@ wall-width  wall-depth  #-of-trials  #-of-walls  #-of-trip wires  hot_spots
 #Distal Queue
 -10.0	6.0	-6.0	10.0	-4.0	10.0	-10.0	4.0
 #Peripheral Queue - 1, (X,Y, Scale, Rotate Angle, OBJ File, Texture)
--1.70	0.15	0.05	0.0 grandfatherClockJune.obj grandfatherClockJune.png
+3.0	0.47	0.05	0.0 grandfatherClockJune.obj grandfatherClockJune.png
 #Peripheral Queue - 2, (X,Y, Scale, Rotate Angle, OBJ File, Texture)
--5.85	3.15	0.15	90.0 Fan.obj Fan.png
+11.3	6.7	0.15	90.0 Fan.obj Fan.png
 //line is listed as width then depth, for the start and end of line
 //first 10 walls are the default 'open' maze

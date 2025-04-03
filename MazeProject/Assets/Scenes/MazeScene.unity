@@ -1999,7 +1999,7 @@ Transform:
   m_GameObject: {fileID: 1432503281}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 0, z: 2}
+  m_LocalPosition: {x: 0.7, y: 0.7, z: 0.7}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2047,6 +2047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4e801fd5cfdcd24c8ea1470880492e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapLoader: {fileID: 2099520068}
   MainCamera: {fileID: 330585545}
   DebugCamera: {fileID: 377329213}
   moveSpeed: 1
@@ -2950,6 +2951,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2027092465}
   m_CullTransparentMesh: 1
+--- !u!114 &2099520068 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
+  m_PrefabInstance: {fileID: 6548718110506754199}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b79618c6adc7f749b426829a9f7366f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5509301088318300012
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3024,6 +3036,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7107778675808200325, guid: ff6f5f95b6463ff47b87b90d19b1e079, type: 3}
     - target: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
       propertyPath: objectSpawner
       value: 
       objectReference: {fileID: 0}
@@ -3043,6 +3059,10 @@ PrefabInstance:
       propertyPath: modelPrefabs.Array.size
       value: 95
       objectReference: {fileID: 0}
+    - target: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
+      propertyPath: 'wallFiles.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4900000, guid: 203656ca18caddd48860bfe04f3ccbe6, type: 3}
     - target: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
       propertyPath: 'wallFiles.Array.data[1]'
       value: 

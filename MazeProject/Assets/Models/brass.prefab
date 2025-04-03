@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: brass
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ee5dc1169321ca343b3701c7cb4a847b, type: 3}
+      propertyPath: m_TagString
+      value: BrassObject
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -11,6 +11,7 @@ TagManager:
   - Cheese
   - WallTripWire
   - Object
+  - DistalObject
   layers:
   - Default
   - TransparentFX

@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: fire_hydrantV2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1a5c528af5d75b14f9cabf3131d3ea6f, type: 3}
+      propertyPath: m_TagString
+      value: FireHydrantObject
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
