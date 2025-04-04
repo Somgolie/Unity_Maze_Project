@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerMovementVR : MonoBehaviour
 {
+    public MapLoader mapLoader;
     private float moveSpeed;
     private float rotationSpeed;
     public float gravity = 9.81f; // Gravity strength
