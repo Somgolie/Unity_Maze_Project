@@ -1129,13 +1129,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1181207131}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1432503285}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &1432503281
 GameObject:
   m_ObjectHideFlags: 0
@@ -1517,7 +1517,7 @@ PrefabInstance:
     - target: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
       propertyPath: spawner
       value: 
-      objectReference: {fileID: 7107778675808200325, guid: ff6f5f95b6463ff47b87b90d19b1e079, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 4454418488633632464, guid: e44f9b03af45a6d4f8cffc19a1468c12, type: 3}
       propertyPath: WallWire
       value: 

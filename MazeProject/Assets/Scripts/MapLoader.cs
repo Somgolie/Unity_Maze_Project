@@ -40,15 +40,17 @@ public class MapLoader : MonoBehaviour
     public Material WallWire;
     [SerializeField]
     public GameObject[] modelPrefabs; // Array to hold references to the prefabs
-    public int currentMazeIndex = -1;  // Start with no maze selected initially
-    private HashSet<int> playedMazes = new HashSet<int>();  // To keep track of mazes that have been played
+    public int currentMazeIndex = -1;  // Start with no maze selected initially  //<-
+
+    List<int> availableMazes = new List<int>();
+    List<int> playedMazes = new List<int>();
     private bool readnext;
 
     public Dictionary<int, Wall> wallDictionary = new Dictionary<int, Wall>();
     public Dictionary<int, Wall> ObjDictionary = new Dictionary<int, Wall>();
     private int objCount;
 
-  
+
     void LoadObjectData(TextAsset mapData)
     {
         Debug.Log("Load more objects  " + (modelPrefabs.Length));
@@ -61,7 +63,7 @@ public class MapLoader : MonoBehaviour
             {
                 if (line.StartsWith("#Peripheral"))
                 {
-        
+
                     readnext = true;
                     objCount = 0;
 
@@ -80,10 +82,10 @@ public class MapLoader : MonoBehaviour
                         {
                             if (objArray == null)
                             {
-           
+
                                 objArray = new float[4];
                             }
-                                if (objCount < 4)
+                            if (objCount < 4)
                             {
                                 objArray[objCount] = float.Parse(v);  // Parse string value into float and store in objArray
 
@@ -96,7 +98,7 @@ public class MapLoader : MonoBehaviour
                                     SpawnPeripheralObject(objArray[0], objArray[1], objArray[2], objArray[3], v);
                                     objCount++;
                                 }
-                                    readnext = false;  // Stop reading after 4 values
+                                readnext = false;  // Stop reading after 4 values
                             }
                         }
                     }
@@ -113,22 +115,22 @@ public class MapLoader : MonoBehaviour
     {
 
 
-        for (int i=0;i<modelPrefabs.Length;i++)
+        for (int i = 0; i < modelPrefabs.Length; i++)
         {
             String target = modelPrefabs[i].name;
 
-            if ( (target+".obj") == objFile)
+            if ((target + ".obj") == objFile)
             {
-                Debug.Log("FOUND");
-                Vector3 pos= new Vector3(x, 0f, y);
 
-                GameObject ObjectPrefab=Instantiate(modelPrefabs[i], pos, Quaternion.identity);
+                Vector3 pos = new Vector3(x, 0f, y);
+
+                GameObject ObjectPrefab = Instantiate(modelPrefabs[i], pos, Quaternion.identity);
                 ObjectPrefab.transform.localScale = new Vector3(scale, scale, scale);
                 ObjectPrefab.tag = "Object";
                 return;
             }
         }
-        Debug.Log("NOT FOUND");
+
 
     }
 
@@ -145,7 +147,7 @@ public class MapLoader : MonoBehaviour
             {
                 if (line.StartsWith("#") || string.IsNullOrWhiteSpace(line)) continue; // Skip comments or empty lines
 
-                string[] values = line.Split('\t');
+                string[] values = line.Split(new char[] { '\t', ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
 
                 // Debugging print to check the values before parsing
                 //Debug.Log($"Processing line: {line}");
@@ -190,7 +192,7 @@ public class MapLoader : MonoBehaviour
                             start = new Vector2(x1, y1),
                             end = new Vector2(x2, y2),
                             texture = WallWire
-                        }) ;
+                        });
 
                         wallCounter++;
                     }
@@ -213,8 +215,7 @@ public class MapLoader : MonoBehaviour
                 return cheeseTexture;
             case "cheesewire.bmp":
                 return CheeseWire;
-            case "wallwire.bmp":
-                return WallWire;
+
             default:
                 Debug.LogWarning("Unknown texture: " + textureName);
                 return null;  // Or return a default material
@@ -222,7 +223,7 @@ public class MapLoader : MonoBehaviour
     }
     public void Start()
     {
-        
+
 
     }
     public void LoadPracticeMaze()
@@ -256,7 +257,7 @@ public class MapLoader : MonoBehaviour
     }
     public void LoadNewMaze()
     {
-        
+
         // Save the previous maze's data before loading a new one
         if (currentMazeIndex != -1 && currentMazeIndex < wallFiles.Count)
         {
@@ -279,25 +280,38 @@ public class MapLoader : MonoBehaviour
 
         int previousMazeIndex = currentMazeIndex; // Store the current maze index before getting the new one
         int nextMazeIndex = GetRandomUnplayedMazeIndex();
-
-        // Load the new maze data
-        TextAsset wallDataFile = wallFiles[nextMazeIndex];
-        LoadWallData(wallDataFile);
-        LoadObjectData(wallDataFile);
-
-        // Reset player position and build walls
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        if (nextMazeIndex != -1)
         {
-            player.transform.position = new Vector3(1f, 0.7f, 2f);
-        }
+            // Load the wall data for the selected maze
+            TextAsset wallDataFile = wallFiles[nextMazeIndex];
+            LoadWallData(wallDataFile);
+            LoadObjectData(wallDataFile);
 
-        for (int i = 0; i < wallDictionary.Count; i++)
-        {
-            Wall currentWall = wallDictionary[i];
-            BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
+
+
+            // Place player at the origin (or desired spawn point)
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+            }
+            else
+            {
+                Debug.LogError("Player not found!");
+            }
+
+            // Build the walls for the maze
+
+            for (int i = 0; i < wallDictionary.Count; i++)
+            {
+                Wall currentWall = wallDictionary[i];
+
+                BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
+
+
+            }
         }
-    }    
+    }
     int GetRandomUnplayedMazeIndex()
     {
         List<int> availableMazes = new List<int>();
@@ -312,10 +326,9 @@ public class MapLoader : MonoBehaviour
 
         if (availableMazes.Count == 0)
         {
-            // All mazes have been played, reset
-            playedMazes.Clear();
-            availableMazes = new List<int>(wallFiles.Count);
-            for (int i = 0; i < wallFiles.Count; i++) availableMazes.Add(i);
+            // All mazes have been played
+            Debug.Log("ALL MAZES COMPLETE!");
+            return -1;
         }
 
         // Select a random index from the available ones
@@ -324,6 +337,8 @@ public class MapLoader : MonoBehaviour
 
         // Mark the current maze as played
         playedMazes.Add(currentMazeIndex);
+        int A = availableMazes.Count - 1;
+
         return currentMazeIndex;
     }
 
@@ -341,6 +356,7 @@ public class MapLoader : MonoBehaviour
             TextAsset currentMazeFile = wallFiles[currentMazeIndex];
             LoadWallData(currentMazeFile);
         }*/
+
     public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
 
@@ -355,14 +371,7 @@ public class MapLoader : MonoBehaviour
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
         // 3. Instantiate the wall
-        GameObject newWall = Instantiate(_wallPrefab, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-
-        // 4. Adjust the wall・s length
-        Vector3 scale = newWall.transform.localScale;
-        scale.x = length;  // Adjust the wall's scale
-        newWall.transform.localScale = scale;
-
-        if (TexMaterial == cheeseTexture)
+        if (TexMaterial != WallWire)
         {
             GameObject newWall = Instantiate(_wallPrefab, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
             // 4. Adjust the wall・s length
@@ -382,13 +391,16 @@ public class MapLoader : MonoBehaviour
             if (wallRenderer != null)
             {
                 wallRenderer.material = TexMaterial;
-          
+
             }
             else
             {
                 //Debug.LogError("Renderer not found on Wall(Clone)!");
             }
         }
+
+
+
         if (TexMaterial == WallWire)
         {
             GameObject Trigger = Instantiate(_WallTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
@@ -396,17 +408,7 @@ public class MapLoader : MonoBehaviour
             scale_trip.x = length;
             Trigger.transform.localScale = scale_trip;
         }
-        // Apply the material to the wall
-        Renderer wallRenderer = newWall.GetComponentInChildren<MeshRenderer>();
-        if (wallRenderer != null)
-        {
-            wallRenderer.material = TexMaterial;
-            //Debug.Log("Renderer is " + wallRenderer.material);
-        }
-        else
-        {
-            //Debug.LogError("Renderer not found on Wall(Clone)!");
-        }
+
     }
     public void buildObjects(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
@@ -415,7 +417,7 @@ public class MapLoader : MonoBehaviour
     void DestroyExistingWalls()
     {
         // Delete all GameObjects with the tags "Wall", "Cheese", or "WallTripWire"
-        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire" ,"Object"};
+        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object" };
 
         foreach (string tag in tagsToDelete)
         {
@@ -428,32 +430,32 @@ public class MapLoader : MonoBehaviour
 
     }
 
-    public void LoadNextMaze()
-    {
+    /*  public void LoadNextMaze()
+      {
 
-        // Debugging current maze index before incrementing
-        Debug.Log("Current Maze Index: " + currentMazeIndex);
+          // Debugging current maze index before incrementing
+          Debug.Log("Current Maze Index: " + currentMazeIndex);
 
-        // Check if we have more mazes left to load
-        if (currentMazeIndex + 1 < wallFiles.Count)
-        {
-            currentMazeIndex++; // Move to the next maze
-        }
-        else
-        {
-            // If no more mazes, loop back to the first maze
-            currentMazeIndex = 0;  // Reset to first maze
-            Debug.Log("Looping back to the first maze.");
-        }
+          // Check if we have more mazes left to load
+          if (currentMazeIndex + 1 < wallFiles.Count)
+          {
+              currentMazeIndex++; // Move to the next maze
+          }
+          else
+          {
+              // If no more mazes, loop back to the first maze
+              currentMazeIndex = 0;  // Reset to first maze
+              Debug.Log("Looping back to the first maze.");
+          }
 
-        // Now clear existing walls and load the new maze
-        DestroyExistingWalls();
-        wallDictionary.Clear();
+          // Now clear existing walls and load the new maze
+          DestroyExistingWalls();
+          wallDictionary.Clear();
 
-        // Load the new maze's data and build the maze
-        LoadNewMaze();
+          // Load the new maze's data and build the maze
+          LoadNewMaze();
 
-    }
+      }*/
 
     void Update()
     {

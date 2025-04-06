@@ -65,7 +65,6 @@ public class MazeEventSystem : MonoBehaviour
         isPracticing = true;
         Debug.Log("Prac!");
         nextpage = "LearningPhase";
-
         RawImage rawImage = UImage.GetComponent<RawImage>();
         rawImage.texture = PracticeBlock;
         mapLoader.LoadPracticeMaze();
@@ -73,10 +72,10 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void Start_MainMazeBlock()
     {
+        player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
         isPracticing = false;
         Debug.Log("Action!");
         nextpage = "LearningPhase";
-        isPerforming = true;
         RawImage rawImage = UImage.GetComponent<RawImage>();
         rawImage.texture = MainBlock;
         mapLoader.LoadNewMaze();
@@ -105,11 +104,11 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void OnPlayerTouchedCheese()
     {
-
-        if (!hasTriggered )
+        Pause();
+        if (!hasTriggered)
         {
             Resume();
-            if (nextpage == "resume" && isLearning==true)
+            if (nextpage == "resume" && isLearning == true)
             {
                 PerformancePhase();
                 isLearning = false;
@@ -179,14 +178,14 @@ public class MazeEventSystem : MonoBehaviour
         // Enter
         if ((isPaused && Input.GetKeyDown(KeyCode.Return)))
         {
-            if (nextpage == "PracticeBlock")
+            if (nextpage == "PracticeBlock")   //from the main instructions
             {
                 Start_PracticeMazeBlock();
                 hasTriggered = false;
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                 return;
             }
-            if (nextpage == "LearningPhase")
+            if (nextpage == "LearningPhase") //block starts
             {
 
                 LearningPhase();
