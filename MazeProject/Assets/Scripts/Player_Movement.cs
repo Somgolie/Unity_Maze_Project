@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class Player_Movement : MonoBehaviour
 {
-    public MapLoader mapLoader;
+    private bool hasTriggered;
+    public MazeEventSystem MazeSystem;
     public Camera MainCamera;
     public Camera DebugCamera;
   
@@ -15,7 +17,7 @@ public class Player_Movement : MonoBehaviour
     float horizontalInput;
     float verticalInput;
 
-    
+
 
 
     Vector3 movedirection;
@@ -36,18 +38,30 @@ public class Player_Movement : MonoBehaviour
     }
     private void Start()
     {
-        mapLoader.LoadNewMaze();
+        
         ShowFirstPersonView();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        hasTriggered=false;
+
+
+
+
     }
     public void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Cheese")) // Ensure the player has the correct tag
         {
+
             Debug.Log("Player touched the trigger!");
-            mapLoader.LoadNewMaze();
+            MazeSystem.OnPlayerTouchedCheese();
+
         }
+    }
+    public void returnback()
+    {
+        transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+        hasTriggered = false;
     }
     private void Update()
     {

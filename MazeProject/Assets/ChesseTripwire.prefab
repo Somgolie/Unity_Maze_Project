@@ -116,7 +116,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5369059568201298534}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 745437338926f5b4da90b22c6236a937, type: 3}
   m_Name: 
@@ -261,3 +261,10 @@ MonoBehaviour:
   - {fileID: 2506443817505617237, guid: 7be50d9bfb49df244a955cd75f052ef6, type: 3}
   - {fileID: 7684134672025632881, guid: e0b19c093f19e3c4b9a72aaa31158e57, type: 3}
   - {fileID: 8917841680237003602, guid: 9e5ff09081b0e1049831a28310ad1e3b, type: 3}
+  currentMazeIndex: -1
+  PracticeMaze: {fileID: 0}
+  MainInstructions: {fileID: 0}
+  LearningPhase: {fileID: 0}
+  PerformancePhase: {fileID: 0}
+  PracticeBlock: {fileID: 0}
+  MainBlock: {fileID: 0}

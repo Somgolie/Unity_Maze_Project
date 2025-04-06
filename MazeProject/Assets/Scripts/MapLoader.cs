@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class MapLoader : MonoBehaviour
@@ -20,6 +21,8 @@ public class MapLoader : MonoBehaviour
     [SerializeField]
     public ObjectSpawner spawner;
 
+    [SerializeField]
+    public TextAsset PracticeMaze;
     public class Wall
     {
         public Vector2 start;
@@ -47,6 +50,7 @@ public class MapLoader : MonoBehaviour
     public Dictionary<int, Wall> ObjDictionary = new Dictionary<int, Wall>();
     private int objCount;
 
+  
     void LoadObjectData(TextAsset mapData)
     {
         Debug.Log("Load more objects  " + (modelPrefabs.Length));
@@ -59,7 +63,7 @@ public class MapLoader : MonoBehaviour
             {
                 if (line.StartsWith("#Peripheral"))
                 {
-                    Debug.Log("Peripheral:");
+        
                     readnext = true;
                     objCount = 0;
 
@@ -78,7 +82,7 @@ public class MapLoader : MonoBehaviour
                         {
                             if (objArray == null)
                             {
-                                Debug.LogWarning("objArray was null. Initializing now.");
+           
                                 objArray = new float[4];
                             }
                                 if (objCount < 4)
@@ -109,8 +113,7 @@ public class MapLoader : MonoBehaviour
 
     void SpawnPeripheralObject(float x, float y, float scale, float rotationAngle, string objFile)
     {
-        Debug.Log(objFile);
-        Debug.Log(modelPrefabs.Length);
+
 
         for (int i=0;i<modelPrefabs.Length;i++)
         {
@@ -118,7 +121,7 @@ public class MapLoader : MonoBehaviour
 
             if ( (target+".obj") == objFile)
             {
-                Debug.Log(target+"FOUND");
+
                 Vector3 pos= new Vector3(x, 0f, y);
 
                 GameObject ObjectPrefab=Instantiate(modelPrefabs[i], pos, Quaternion.identity);
@@ -127,7 +130,7 @@ public class MapLoader : MonoBehaviour
                 return;
             }
         }
-        Debug.Log(objFile+"NOT FOUND");
+
 
     }
 
@@ -172,6 +175,7 @@ public class MapLoader : MonoBehaviour
 
                         wallCounter++;
                     }
+                    // Check for wall format: x1, y1, x2, y2
                     if (values.Length == 4)
                     {
                         float x1 = float.Parse(values[0]);
@@ -219,10 +223,41 @@ public class MapLoader : MonoBehaviour
     }
     public void Start()
     {
-        LoadNewMaze();
+        
+
+    }
+    public void LoadPracticeMaze()
+    {
+        DestroyExistingWalls();
+        wallDictionary.Clear();
+        TextAsset wallDataFile = PracticeMaze;
+        LoadWallData(wallDataFile);
+        LoadObjectData(wallDataFile);
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+        }
+        else
+        {
+            Debug.LogError("Player not found!");
+        }
+
+        // Build the walls for the maze
+
+        for (int i = 0; i < wallDictionary.Count; i++)
+        {
+            Wall currentWall = wallDictionary[i];
+
+            BuildWall(currentWall.start.x * 2, currentWall.start.y * 2, currentWall.end.x * 2, currentWall.end.y * 2, currentWall.texture);
+
+
+        }
     }
     public void LoadNewMaze()
     {
+        
         // Save the previous maze's data before loading a new one
         if (currentMazeIndex != -1 && currentMazeIndex < wallFiles.Count)
         {
@@ -252,7 +287,7 @@ public class MapLoader : MonoBehaviour
             LoadWallData(wallDataFile);
             LoadObjectData(wallDataFile);
 
-            Debug.Log("Loaded " + wallDictionary.Count + " walls into the dictionary.");
+            
 
             // Place player at the origin (or desired spawn point)
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -266,7 +301,7 @@ public class MapLoader : MonoBehaviour
             }
 
             // Build the walls for the maze
-            Debug.Log("Building maze number: " + nextMazeIndex);
+           
             for (int i = 0; i < wallDictionary.Count; i++)
             {
                 Wall currentWall = wallDictionary[i];
@@ -303,7 +338,7 @@ public class MapLoader : MonoBehaviour
         // Mark the current maze as played
         playedMazes.Add(currentMazeIndex);
         int A= availableMazes.Count -1;
-        Debug.Log("Available: " + A);
+        
         return currentMazeIndex;
     }
 
@@ -356,7 +391,7 @@ public class MapLoader : MonoBehaviour
             if (wallRenderer != null)
             {
                 wallRenderer.material = TexMaterial;
-                //Debug.Log("Renderer is " + wallRenderer.material);
+          
             }
             else
             {

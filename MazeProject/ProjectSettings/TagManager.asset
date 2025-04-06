@@ -12,6 +12,34 @@ TagManager:
   - WallTripWire
   - Object
   - DistalObject
+  - BedObject
+  - BrassObject
+  - WetSignObject
+  - TrafficCone
+  - Telescope
+  - GasContainerObject
+  - PalmTreeObject
+  - PlantObject
+  - VaccumObject
+  - carObject
+  - cabinetObject
+  - BusObject
+  - BucketObject
+  - FanObject
+  - FireHydrantObject
+  - FirstAidObject
+  - grandClockObject
+  - MetalBarrelObject
+  - LockerObject
+  - ParkBenchObject
+  - PhoneObject
+  - pcObject
+  - SofaObject
+  - sideTableObject
+  - FireExtinginsherObject
+  - UI
+  - UIcanvas
+  - Timer
   layers:
   - Default
   - TransparentFX
