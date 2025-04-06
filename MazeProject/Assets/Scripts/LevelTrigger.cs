@@ -12,7 +12,7 @@ public class LevelTrigger : MonoBehaviour
         if (other.CompareTag("Player")) // Ensure the player has the correct tag
         {
             Debug.Log("Player touched the trigger!");
-            
+            mapLoader.LoadNewMaze();
             
 /*            if (mazeSystem.LearningPhase == true)
             {
