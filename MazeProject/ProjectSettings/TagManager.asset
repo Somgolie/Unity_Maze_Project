@@ -40,6 +40,9 @@ TagManager:
   - UI
   - UIcanvas
   - Timer
+  - UI_Q
+  - UI_I
+  - BreakButton
   layers:
   - Default
   - TransparentFX
