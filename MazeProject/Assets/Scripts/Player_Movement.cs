@@ -62,7 +62,7 @@ public class Player_Movement : MonoBehaviour
     {
         transform.position = new Vector3(0.7f, 0.7f, 0.7f);
         hasTriggered = false;
-    }
+    }/*
     private void Update()
     {
         MyInput();
@@ -84,18 +84,18 @@ public class Player_Movement : MonoBehaviour
     private void FixedUpdate()
     {
         moveplayer();
-    }
+    }*/
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
     }
-
+    /*
     private void moveplayer()
     {
         movedirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
         rb.AddForce(movedirection.normalized * moveSpeed * 10f, ForceMode.Force);
-    }
+    }*/
     /*    private void Start()
         {
             rb = GetComponent<Rigidbody>();
