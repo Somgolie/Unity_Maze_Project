@@ -65,7 +65,7 @@ public class MazeEventSystem : MonoBehaviour
 
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-
+        UICanvas.GetComponent<Canvas>().worldCamera = Camera.main;
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = MainInstructions;
         Pause();
@@ -96,10 +96,10 @@ public class MazeEventSystem : MonoBehaviour
         Debug.Log("Action!");
         nextpage = "LearningPhase";
 
-
+        
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-
+        
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = MainBlock;
         mapLoader.LoadNewMaze();
@@ -179,6 +179,7 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void OnPlayerTouchedCheese()
     {
+        player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
         Pause();
         if (!hasTriggered)
         {
@@ -223,6 +224,10 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void Update()
     {
+        UICanvas.transform.position = player.transform.position + player.transform.forward * 0.5f;
+        Timer.transform.position = player.transform.position + player.transform.forward * 0.5f + Vector3.up * 0.32f+Vector3.left*0.3f;
+
+
         // Enter
         if (mazenum >= 20)
         {
