@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.XR;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class Player_Movement : MonoBehaviour

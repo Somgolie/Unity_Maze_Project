@@ -29,7 +29,7 @@ public class PlayerMovementVR : MonoBehaviour
         }
 
         // Get values from EyeTrackingDataManager
-        moveSpeed = EyeTrackingDataManager.Instance != null ? EyeTrackingDataManager.Instance.LinearVelocity : 2.0f; // Default speed
+        moveSpeed = EyeTrackingDataManager.Instance != null ? EyeTrackingDataManager.Instance.LinearVelocity : 5.0f; // Default speed
         rotationSpeed = EyeTrackingDataManager.Instance != null ? EyeTrackingDataManager.Instance.RotationalVelocity : 50.0f; // Default rotation
 
         Debug.Log($"Loaded Linear Velocity: {moveSpeed}, Rotational Velocity: {rotationSpeed}");

@@ -1171,13 +1171,13 @@ MonoBehaviour:
   Timer: {fileID: 3808447}
   BreakButton: {fileID: 1081520338}
   targetTime: 0
-  toggleGroup: {fileID: 0}
+  toggleGroup: {fileID: 2016632603}
   toggles:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1718453797}
+  - {fileID: 1702662016}
+  - {fileID: 429653160}
+  - {fileID: 1354591383}
+  - {fileID: 51956101}
 --- !u!1 &392818719
 GameObject:
   m_ObjectHideFlags: 0
@@ -2034,6 +2034,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 724909662}
   m_CullTransparentMesh: 1
+--- !u!1 &1015535715 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2250693249564283891, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+  m_PrefabInstance: {fileID: 4784640175384707799}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1081520338
 GameObject:
   m_ObjectHideFlags: 0
@@ -2800,6 +2805,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1440035633 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5447318043367995985, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+  m_PrefabInstance: {fileID: 4784640175384707799}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1454867484
 GameObject:
   m_ObjectHideFlags: 0
@@ -3883,6 +3893,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2250693249564283891, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2438564104667316291, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
       propertyPath: m_InteractionManager
       value: 
@@ -3891,6 +3905,18 @@ PrefabInstance:
       propertyPath: mapLoader
       value: 
       objectReference: {fileID: 130898361}
+    - target: {fileID: 5447318043367995985, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568157892375830478, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: m_LeftController
+      value: 
+      objectReference: {fileID: 1015535715}
+    - target: {fileID: 8568157892375830478, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: m_RightController
+      value: 
+      objectReference: {fileID: 1440035633}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3929,7 +3955,7 @@ MonoBehaviour:
   MazeSystem: {fileID: 357803979}
   MainCamera: {fileID: 4784640175384707802}
   DebugCamera: {fileID: 0}
-  moveSpeed: 1
+  moveSpeed: 5
   movedrag: 5
   orientation: {fileID: 4784640175384707801}
 --- !u!1660057539 &9223372036854775807
