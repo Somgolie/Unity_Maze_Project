@@ -54,9 +54,11 @@ public class MazeEventSystem : MonoBehaviour
 
     public ToggleGroup toggleGroup;
     public List<Toggle> toggles = new List<Toggle>();
+    public bool enter;
     //if the maze was a learning maze the next maze is the same else pick a new maze  and mazenum+1
     void Start()
     {
+        enter=false;
         UImage_I = GameObject.FindGameObjectWithTag("UI_I");
         UImage_Q = GameObject.FindGameObjectWithTag("UI_Q");
         UICanvas = GameObject.FindGameObjectWithTag("UIcanvas");
@@ -64,7 +66,7 @@ public class MazeEventSystem : MonoBehaviour
         Timer = GameObject.FindGameObjectWithTag("Timer");
         BreakButton = GameObject.FindGameObjectWithTag("BreakButton");
         nextpage = "PracticeBlock";
-
+        BreakButton.SetActive(false);
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
         UICanvas.GetComponent<Canvas>().worldCamera = Camera.main;
@@ -181,26 +183,28 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void OnPlayerTouchedCheese()
     {
-        player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
-        Pause();
-        if (!hasTriggered)
-        {
-            Resume();
-            if (nextpage == "JOL")
-            {
-                JOLQuestion();
-                isLearning = false;
-                return;
-            }
-            if (nextpage == "RCJ")
-            {
-                RCJQuestion();
-                isPerforming = false;
-                return;
+        TimerEnd();
+        // player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+        // Pause();
+        // if (!hasTriggered)
+        // {
+        //     Resume();
+        //     if (nextpage == "JOL")
+        //     {
+        //         JOLQuestion();
+        //         isLearning = false;
+        //         return;
+        //     }
+        //     if (nextpage == "RCJ")
+        //     {
+        //         RCJQuestion();
 
-            }
-            hasTriggered = true; // prevent it from repeating
-        }
+        //         isPerforming = false;
+        //         return;
+
+        //     }
+        //     hasTriggered = true; // prevent it from repeating
+        // }
     }
     public void TimerEnd()
     {
@@ -217,6 +221,7 @@ public class MazeEventSystem : MonoBehaviour
             if (nextpage == "RCJ")
             {
                 RCJQuestion();
+                
                 isPerforming = false;
                 return;
 
@@ -224,12 +229,25 @@ public class MazeEventSystem : MonoBehaviour
             hasTriggered = true; // prevent it from repeating
         }
     }
+    // public void pressed_enter()
+    // {
+    //     Debug.Log("enter");
+    //     if (!enter)
+    //     {
+    //         enter=true;
+    //     }
+    //     return;
+    // }
+
     public void Update()
     {
         UICanvas.transform.position = player.transform.position + player.transform.forward * 0.5f;
         Timer.transform.position = player.transform.position + player.transform.forward * 0.5f + Vector3.up * 0.32f+Vector3.left*0.3f;
 
-
+        // if (Input.GetKeyDown(KeyCode.Return))
+        // {
+        //     pressed_enter();
+        // }
         // Enter
         if (mazenum >= 20)
         {
@@ -244,6 +262,7 @@ public class MazeEventSystem : MonoBehaviour
                 Start_PracticeMazeBlock();
                 hasTriggered = false;
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                enter=false;
                 return;
             }
 
@@ -254,6 +273,7 @@ public class MazeEventSystem : MonoBehaviour
                 LearningPhase();
                 hasTriggered = false;
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                enter=false;
                 return;
             }
 
@@ -263,11 +283,12 @@ public class MazeEventSystem : MonoBehaviour
                 Start_MainMazeBlock();
                 hasTriggered = false;
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                enter=false;
                 return;
-            }else if (nextpage=="NextBlock" && isPracticing == false) //regular next block
+            }else if (nextpage=="NextBlock" && isPracticing == false && mazenum < 20) //regular next block
             {
 
-                if (mazenum != 9)
+                if (mazenum != 10)
                 {
                     BreakButton.SetActive(false);
                     LearningPhase();
@@ -277,9 +298,10 @@ public class MazeEventSystem : MonoBehaviour
                     GetSelectedRating();
                     mazenum += 1;
                     mapLoader.LoadNewMaze();
+                    enter=false;
                     return;
                 }
-                else if(mazenum == 9)
+                else if(mazenum == 10)
                 {
                     BreakButton.SetActive(true);
                     takeAbreak();
@@ -289,8 +311,10 @@ public class MazeEventSystem : MonoBehaviour
                     GetSelectedRating();
 
                     mapLoader.LoadNewMaze();
+                    enter=false;
                     return;
                 }
+                enter=false;
                 return;
             }
 
@@ -301,6 +325,7 @@ public class MazeEventSystem : MonoBehaviour
                 PerformancePhase();
                 hasTriggered = false;
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                enter=false;
                 return;
             }
             if (nextpage == "resume")
@@ -318,6 +343,7 @@ public class MazeEventSystem : MonoBehaviour
                 Resume();
                 hasTriggered = false;
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                enter=false;
                 return;
             }
 

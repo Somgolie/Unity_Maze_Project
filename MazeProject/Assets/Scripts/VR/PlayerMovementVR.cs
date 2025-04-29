@@ -14,6 +14,7 @@ public class PlayerMovementVR : MonoBehaviour
     private InputDevice leftController;
     private InputDevice rightController;
 
+    public MazeEventSystem MazeSystem;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -123,6 +124,16 @@ public class PlayerMovementVR : MonoBehaviour
 
         return false;
     }
+    public void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Cheese")) // Ensure the player has the correct tag
+            {
+
+                Debug.Log("Player touched the trigger!");
+                MazeSystem.OnPlayerTouchedCheese();
+
+            }
+        }
 
     // New method to handle UI interaction
 
