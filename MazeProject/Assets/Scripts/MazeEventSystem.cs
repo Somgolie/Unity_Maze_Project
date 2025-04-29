@@ -5,6 +5,8 @@ using System.IO;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.SceneManagement;
 public class MazeEventSystem : MonoBehaviour
 {
     public MapLoader mapLoader;
