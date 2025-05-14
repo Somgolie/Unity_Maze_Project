@@ -609,6 +609,9 @@ MonoBehaviour:
   - {fileID: 7684134672025632881, guid: e0b19c093f19e3c4b9a72aaa31158e57, type: 3}
   - {fileID: 8917841680237003602, guid: 9e5ff09081b0e1049831a28310ad1e3b, type: 3}
   currentMazeIndex: -1
+  moon: {fileID: 7763027199234290555, guid: d3d53334eda554e49b6f3a97cf4ee96c, type: 3}
+  Spawn_Moon: 0
+  upwards: {x: 0, y: 0, z: 0}
 --- !u!1 &139301680
 GameObject:
   m_ObjectHideFlags: 0

@@ -41,7 +41,7 @@ public class MapLoader : MonoBehaviour
     [SerializeField]
     public GameObject[] modelPrefabs; // Array to hold references to the prefabs
     public int currentMazeIndex = -1;  // Start with no maze selected initially  //<-
-
+    public GameObject moon;
     List<int> availableMazes = new List<int>();
     List<int> playedMazes = new List<int>();
     private bool readnext;
@@ -50,7 +50,10 @@ public class MapLoader : MonoBehaviour
     public Dictionary<int, Wall> ObjDictionary = new Dictionary<int, Wall>();
     private int objCount;
 
-
+    public int Spawn_Moon;
+    public Vector3 upwards;
+    private int chesseCounter;
+    private int wallcounter;
     void LoadObjectData(TextAsset mapData)
     {
         Debug.Log("Load more objects  " + (modelPrefabs.Length));
@@ -228,6 +231,7 @@ public class MapLoader : MonoBehaviour
     }
     public void LoadPracticeMaze()
     {
+        Spawn_Moon = 1;
         DestroyExistingWalls();
         wallDictionary.Clear();
         TextAsset wallDataFile = PracticeMaze;
@@ -257,7 +261,9 @@ public class MapLoader : MonoBehaviour
     }
     public void LoadNewMaze()
     {
-
+        Spawn_Moon = 1;
+        chesseCounter = 0;
+        wallcounter = 0;
         // Save the previous maze's data before loading a new one
         if (currentMazeIndex != -1 && currentMazeIndex < wallFiles.Count)
         {
@@ -359,6 +365,7 @@ public class MapLoader : MonoBehaviour
 
     public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
+        wallcounter += 1;
 
         // 1. Calculate midpoint in 3D
         Vector3 startPos = new Vector3(x1, 0f, y1);
@@ -381,21 +388,46 @@ public class MapLoader : MonoBehaviour
 
             if (TexMaterial == cheeseTexture)
             {
+                chesseCounter += 1;
                 GameObject Finishline = Instantiate(_CheeseTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
                 Vector3 scale_cheese = Finishline.transform.localScale;
                 scale_cheese.x = length;
                 Finishline.transform.localScale = scale_cheese;
+                if (Spawn_Moon==1)
+                {
+                    GameObject moony = Instantiate(moon, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
+                    upwards = new Vector3(0, 8, 0);
+                    moony.transform.position = moony.transform.position + upwards;
+                    Spawn_Moon = 0;
+                }
+
             }
             // Apply the material to the wall
             Renderer wallRenderer = newWall.GetComponentInChildren<MeshRenderer>();
             if (wallRenderer != null)
             {
                 wallRenderer.material = TexMaterial;
+                if (TexMaterial == cheeseTexture )
+                {
+                    Vector3 gap = new Vector3(0, 0, 0.5f);
+                    newWall.tag = "Cheese";
+                    newWall.transform.localScale= newWall.transform.localScale + gap;
+                }
+                if (wallcounter == 5)
+                {
+                    Vector3 gap = new Vector3(1, 0, 0);
+                    newWall.transform.position= newWall.transform.position + gap;
+                }
 
             }
             else
             {
-                //Debug.LogError("Renderer not found on Wall(Clone)!");
+                if(newWall.tag == "Cheese")
+                {
+                    Vector3 gap = new Vector3(0, 0, 0.5f);
+                    newWall.tag = "Cheese";
+                    newWall.transform.localScale = newWall.transform.localScale + gap;
+                }
             }
         }
 

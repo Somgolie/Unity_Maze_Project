@@ -285,7 +285,7 @@ public class MazeEventSystem : MonoBehaviour
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                 enter=false;
                 return;
-            }else if (nextpage=="NextBlock" && isPracticing == false && mazenum < 20) //regular next block
+            }else if (nextpage=="NextBlock" && isPracticing == false && mazenum < 21) //regular next block
             {
 
                 if (mazenum != 10)
