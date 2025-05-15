@@ -449,7 +449,7 @@ public class MapLoader : MonoBehaviour
     void DestroyExistingWalls()
     {
         // Delete all GameObjects with the tags "Wall", "Cheese", or "WallTripWire"
-        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object" };
+        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object","DistalObject" };
 
         foreach (string tag in tagsToDelete)
         {
