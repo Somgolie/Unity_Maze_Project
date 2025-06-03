@@ -17,6 +17,9 @@ public class EyeTrackingDataManager : MonoBehaviour
         }
         else
         {
+
+
+            
             Destroy(gameObject);
         }
     }

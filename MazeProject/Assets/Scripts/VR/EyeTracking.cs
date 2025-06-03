@@ -12,9 +12,17 @@ public class EyeTracking : MonoBehaviour
     private float totalSessionTime = 0f;
     private string userName = "DefaultUser";
 
+    [Header("Gaze Dot UI")]
+    public RectTransform gazeDot; // assign in inspector
+    private Camera mainCamera;
+
     void Start()
     {
         InitializeUserName();
+        if (mainCamera == null)
+    {
+        mainCamera = Camera.main;
+    }
     }
 
     void Update()
@@ -25,10 +33,20 @@ public class EyeTracking : MonoBehaviour
 
     void TrackGaze()
     {
-        if (!VarjoEyeTracking.IsGazeAllowed() || !VarjoEyeTracking.IsGazeCalibrated()) return;
+        if (!VarjoEyeTracking.IsGazeAllowed() || !VarjoEyeTracking.IsGazeCalibrated())
+        {
+            if (gazeDot != null)
+                gazeDot.gameObject.SetActive(false);
+            return;
+        }
 
         VarjoEyeTracking.GazeData gazeData = VarjoEyeTracking.GetGaze();
-        if (gazeData.status != VarjoEyeTracking.GazeStatus.Valid) return;
+        if (gazeData.status != VarjoEyeTracking.GazeStatus.Valid)
+        {
+            if (gazeDot != null)
+                gazeDot.gameObject.SetActive(false);
+            return;
+        }
 
         Transform hmdTransform = Camera.main.transform;
         Vector3 gazeOrigin = hmdTransform.TransformPoint(gazeData.gaze.origin);
@@ -45,6 +63,24 @@ public class EyeTracking : MonoBehaviour
                 TrackGazeTransition(tag);
                 lastGazeTag = tag;
             }
+            if (gazeDot != null)
+            {
+                Vector3 screenPos = mainCamera.WorldToScreenPoint(hit.point);
+                if (screenPos.z > 0)
+                {
+                    gazeDot.gameObject.SetActive(true);
+                    gazeDot.position = screenPos;
+                }
+                else
+                {
+                    gazeDot.gameObject.SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            if (gazeDot != null)
+                gazeDot.gameObject.SetActive(false);
         }
     }
 
@@ -69,6 +105,8 @@ public class EyeTracking : MonoBehaviour
         gazeCountPerTag.Clear();
         lastGazeTag = "";
         totalSessionTime = 0f;
+        if (gazeDot != null)
+            gazeDot.gameObject.SetActive(false);
     }
 
     void MergeCSVFiles()
