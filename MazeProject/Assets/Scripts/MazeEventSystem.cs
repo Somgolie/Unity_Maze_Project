@@ -229,15 +229,15 @@ public class MazeEventSystem : MonoBehaviour
             hasTriggered = true; // prevent it from repeating
         }
     }
-    // public void pressed_enter()
-    // {
-    //     Debug.Log("enter");
-    //     if (!enter)
-    //     {
-    //         enter=true;
-    //     }
-    //     return;
-    // }
+     public void pressed_enter()
+     {
+         Debug.Log("enter");
+         if (!enter)
+         {
+             enter=true;
+         }
+         return;
+     }
 
     public void Update()
     {
@@ -254,8 +254,8 @@ public class MazeEventSystem : MonoBehaviour
             takeAbreak();
             Debug.Log("ALL MAZES COMPLETED");
         }
-        
-        if ((isPaused && Input.GetKeyDown(KeyCode.Return)))
+        //Input.GetKeyDown(KeyCode.Return))
+        if (isPaused && enter==true)
         {
             if (nextpage == "PracticeBlock")   //from the main instructions
             {
