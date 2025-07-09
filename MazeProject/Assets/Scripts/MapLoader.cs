@@ -393,11 +393,22 @@ public class MapLoader : MonoBehaviour
                 Vector3 scale_cheese = Finishline.transform.localScale;
                 scale_cheese.x = length;
                 Finishline.transform.localScale = scale_cheese;
-                if (Spawn_Moon==1)
+
+                // Spawn moon at one of four fixed positions
+                if (Spawn_Moon == 1)
                 {
-                    GameObject moony = Instantiate(moon, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-                    upwards = new Vector3(0, 8, 0);
-                    moony.transform.position = moony.transform.position + upwards;
+                    Vector3[] possiblePositions = new Vector3[]
+                    {
+                        new Vector3(-10f, 8f, 6f),
+                        new Vector3(-6f, 8f, 10f),
+                        new Vector3(-4f, 8f, 10f),
+                        new Vector3(-10f, 8f, 4f)
+                    };
+
+                    int randomIndex = UnityEngine.Random.Range(0, possiblePositions.Length);
+                    Vector3 spawnPos = possiblePositions[randomIndex];
+
+                    Instantiate(moon, spawnPos, Quaternion.identity);
                     Spawn_Moon = 0;
                 }
 

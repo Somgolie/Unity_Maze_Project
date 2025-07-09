@@ -80,7 +80,7 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void Start_PracticeMazeBlock()
     {
-        player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+        
         isPracticing = true;
         Debug.Log("Prac!");
         nextpage = "LearningPhase";
@@ -95,7 +95,7 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void Start_MainMazeBlock()
     {
-        player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+        
         isPracticing = false;
         Debug.Log("Action!");
         nextpage = "LearningPhase";
@@ -221,7 +221,6 @@ public class MazeEventSystem : MonoBehaviour
             if (nextpage == "RCJ")
             {
                 RCJQuestion();
-                
                 isPerforming = false;
                 return;
 
@@ -261,7 +260,7 @@ public class MazeEventSystem : MonoBehaviour
             {
                 Start_PracticeMazeBlock();
                 hasTriggered = false;
-                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                
                 enter=false;
                 return;
             }
@@ -272,7 +271,7 @@ public class MazeEventSystem : MonoBehaviour
                 Debug.Log("lerm");
                 LearningPhase();
                 hasTriggered = false;
-                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                
                 enter=false;
                 return;
             }
@@ -282,7 +281,7 @@ public class MazeEventSystem : MonoBehaviour
                 BreakButton.SetActive(false);
                 Start_MainMazeBlock();
                 hasTriggered = false;
-                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+               
                 enter=false;
                 return;
             }else if (nextpage=="NextBlock" && isPracticing == false && mazenum < 21) //regular next block
@@ -293,7 +292,7 @@ public class MazeEventSystem : MonoBehaviour
                     BreakButton.SetActive(false);
                     LearningPhase();
                     hasTriggered = false;
-                    player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                    
 
                     GetSelectedRating();
                     mazenum += 1;
@@ -306,7 +305,7 @@ public class MazeEventSystem : MonoBehaviour
                     BreakButton.SetActive(true);
                     takeAbreak();
                     hasTriggered = false;
-                    player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                   
 
                     GetSelectedRating();
 
@@ -324,7 +323,7 @@ public class MazeEventSystem : MonoBehaviour
                 GetSelectedRating();
                 PerformancePhase();
                 hasTriggered = false;
-                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+                
                 enter=false;
                 return;
             }
