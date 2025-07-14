@@ -56,24 +56,7 @@ public class Player_Movement : MonoBehaviour
         transform.position = new Vector3(0.7f, 0.7f, 0.7f);
         hasTriggered = false;
     }
-    private void Update()
-    {
-        MyInput();
-        rb.linearDamping = movedrag;
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            if (MainCamera.enabled == true)
-            {
-                ShowOverheadView();
 
-            }
-            if (MainCamera.enabled == false)
-            {
-                ShowFirstPersonView();
-  
-            }
-        }
-    }
     private void FixedUpdate()
     {
         horizontalInput = 0;

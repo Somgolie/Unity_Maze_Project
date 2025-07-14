@@ -65,14 +65,14 @@ public class MazeEventSystem : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         Timer = GameObject.FindGameObjectWithTag("Timer");
         BreakButton = GameObject.FindGameObjectWithTag("BreakButton");
-        nextpage = "PracticeBlock";
+        player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+        Start_PracticeMazeBlock();
         BreakButton.SetActive(false);
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
         UICanvas.GetComponent<Canvas>().worldCamera = Camera.main;
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = MainInstructions;
-        Pause();
 
         //MUST BE LOADED ONCE
         mazenum = 0;
@@ -115,6 +115,7 @@ public class MazeEventSystem : MonoBehaviour
         Debug.Log("Learn! "+mazenum);
         nextpage = "resume";
         isLearning = true;
+        isPerforming = false;
         targetTime = 45.0f;
 
 
@@ -123,6 +124,7 @@ public class MazeEventSystem : MonoBehaviour
 
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = LearningInstructions;
+
         Pause();
     }
     public void PerformancePhase()
@@ -130,6 +132,7 @@ public class MazeEventSystem : MonoBehaviour
 
         Debug.Log("Perform! "+mazenum);
         nextpage = "resume";
+        isLearning = false;
         isPerforming = true;
         targetTime = 240.0f;
 
@@ -186,21 +189,25 @@ public class MazeEventSystem : MonoBehaviour
         if (!hasTriggered)
         {
             Pause();
-
+            
             if (isLearning)
             {
+                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                 isLearning = false;
                 nextpage = "JOL";
+                hasTriggered = true;
                 JOLQuestion();
             }
             else if (isPerforming)
             {
+                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                 isPerforming = false;
                 nextpage = "RCJ";
+                hasTriggered = true;
                 RCJQuestion();
             }
 
-            hasTriggered = true;
+            
         }
     }
     public void TimerEnd()
@@ -211,18 +218,22 @@ public class MazeEventSystem : MonoBehaviour
 
             if (isLearning)
             {
+                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                 isLearning = false;
                 nextpage = "JOL";
+                hasTriggered = true;
                 JOLQuestion();
             }
             else if (isPerforming)
             {
+                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                 isPerforming = false;
                 nextpage = "RCJ";
+                hasTriggered = true;
                 RCJQuestion();
             }
 
-            hasTriggered = true;
+            
         }
     }
      public void pressed_enter()
@@ -255,19 +266,20 @@ public class MazeEventSystem : MonoBehaviour
         {
             enter = false;
 
-            // Player just finished JOL → go to Performance
+            // Player just finished JOL -> go to Performance
             if (nextpage == "PerformancePhase")
             {
                 SaveAnswerToFile("JOL", mazenum, GetSelectedRating());
+                hasTriggered = false;
                 PerformancePhase();
                 return;
             }
 
-            // Player just finished RCJ → go to next learning or finish
+            // Player just finished RCJ -> go to next learning or finish
             if (nextpage == "NextBlock")
             {
                 SaveAnswerToFile("RCJ", mazenum, GetSelectedRating());
-
+                hasTriggered = false;
                 if (isPracticing)
                 {
                     // End of practice block, start real
@@ -288,12 +300,6 @@ public class MazeEventSystem : MonoBehaviour
                 return;
             }
 
-            // From intro screen → practice
-            if (nextpage == "PracticeBlock")
-            {
-                Start_PracticeMazeBlock();
-                return;
-            }
 
             // Start learning
             if (nextpage == "LearningPhase")
@@ -339,9 +345,8 @@ public class MazeEventSystem : MonoBehaviour
 
             Time.timeScale = 1f;
             isPaused = false;
-            
             UICanvas.SetActive(false);
-            player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+            
 
 
     }
