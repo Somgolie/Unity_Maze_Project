@@ -50,21 +50,12 @@ public class Player_Movement : MonoBehaviour
 
 
     }
-    public void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Cheese")) // Ensure the player has the correct tag
-        {
 
-            Debug.Log("Player touched the trigger!");
-            MazeSystem.OnPlayerTouchedCheese();
-
-        }
-    }
     public void returnback()
     {
         transform.position = new Vector3(0.7f, 0.7f, 0.7f);
         hasTriggered = false;
-    }/*
+    }
     private void Update()
     {
         MyInput();
@@ -85,31 +76,39 @@ public class Player_Movement : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        horizontalInput = 0;
+        verticalInput = 0;
+
+        GetKeyboardInput();
+ 
+
         moveplayer();
-    }*/
+    }
+
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
     }
-    /*
+
     private void moveplayer()
     {
         movedirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        rb.AddForce(movedirection.normalized * moveSpeed * 10f, ForceMode.Force);
-    }*/
-    /*    private void Start()
+
+        if (movedirection != Vector3.zero)
         {
-            rb = GetComponent<Rigidbody>();
+            rb.AddForce(movedirection.normalized * moveSpeed * 10f, ForceMode.Force);
         }
+    }
+    /*
 
-        private void FixedUpdate()
-        {
-            float horizontalInput = Input.GetAxis("Horizontal");
-            float verticalInput = Input.GetAxis("Vertical");
+     private void FixedUpdate()
+     {
 
-            Vector3 movement = new Vector3(horizontalInput, 0f, verticalInput) * moveSpeed;
-
-            rb.MovePosition(rb.position + movement * Time.fixedDeltaTime);
-        }*/
+     } */
+    private void GetKeyboardInput()
+    {
+        horizontalInput = Input.GetAxis("Horizontal");   // WASD or arrow keys
+        verticalInput = Input.GetAxis("Vertical");
+    }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -183,49 +183,46 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void OnPlayerTouchedCheese()
     {
-        TimerEnd();
-        // player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
-        // Pause();
-        // if (!hasTriggered)
-        // {
-        //     Resume();
-        //     if (nextpage == "JOL")
-        //     {
-        //         JOLQuestion();
-        //         isLearning = false;
-        //         return;
-        //     }
-        //     if (nextpage == "RCJ")
-        //     {
-        //         RCJQuestion();
+        if (!hasTriggered)
+        {
+            Pause();
 
-        //         isPerforming = false;
-        //         return;
+            if (isLearning)
+            {
+                isLearning = false;
+                nextpage = "JOL";
+                JOLQuestion();
+            }
+            else if (isPerforming)
+            {
+                isPerforming = false;
+                nextpage = "RCJ";
+                RCJQuestion();
+            }
 
-        //     }
-        //     hasTriggered = true; // prevent it from repeating
-        // }
+            hasTriggered = true;
+        }
     }
     public void TimerEnd()
     {
-        Pause();
         if (!hasTriggered)
         {
-            Resume();
-            if (nextpage == "JOL")
-            {
-                JOLQuestion();
-                isLearning = false;
-                return;
-            }
-            if (nextpage == "RCJ")
-            {
-                RCJQuestion();
-                isPerforming = false;
-                return;
+            Pause();
 
+            if (isLearning)
+            {
+                isLearning = false;
+                nextpage = "JOL";
+                JOLQuestion();
             }
-            hasTriggered = true; // prevent it from repeating
+            else if (isPerforming)
+            {
+                isPerforming = false;
+                nextpage = "RCJ";
+                RCJQuestion();
+            }
+
+            hasTriggered = true;
         }
     }
      public void pressed_enter()
@@ -254,99 +251,65 @@ public class MazeEventSystem : MonoBehaviour
             Debug.Log("ALL MAZES COMPLETED");
         }
         //Input.GetKeyDown(KeyCode.Return))
-        if (isPaused && enter==true)
+        if (isPaused && enter)
         {
-            if (nextpage == "PracticeBlock")   //from the main instructions
+            enter = false;
+
+            // Player just finished JOL → go to Performance
+            if (nextpage == "PerformancePhase")
             {
-                Start_PracticeMazeBlock();
-                hasTriggered = false;
-                
-                enter=false;
+                SaveAnswerToFile("JOL", mazenum, GetSelectedRating());
+                PerformancePhase();
                 return;
             }
 
+            // Player just finished RCJ → go to next learning or finish
+            if (nextpage == "NextBlock")
+            {
+                SaveAnswerToFile("RCJ", mazenum, GetSelectedRating());
+
+                if (isPracticing)
+                {
+                    // End of practice block, start real
+                    Start_MainMazeBlock();
+                }
+                else if (mazenum < 20)
+                {
+                    mazenum += 1;
+                    mapLoader.LoadNewMaze();
+                    LearningPhase();
+                }
+                else
+                {
+                    // All real mazes completed
+                    takeAbreak();
+                    Debug.Log("ALL MAZES COMPLETED");
+                }
+                return;
+            }
+
+            // From intro screen → practice
+            if (nextpage == "PracticeBlock")
+            {
+                Start_PracticeMazeBlock();
+                return;
+            }
+
+            // Start learning
             if (nextpage == "LearningPhase")
             {
                 BreakButton.SetActive(false);
-                Debug.Log("lerm");
                 LearningPhase();
-                hasTriggered = false;
-                
-                enter=false;
                 return;
             }
 
-            if (nextpage == "NextBlock" && isPracticing==true) //actual block starts
-            {
-                BreakButton.SetActive(false);
-                Start_MainMazeBlock();
-                hasTriggered = false;
-               
-                enter=false;
-                return;
-            }else if (nextpage=="NextBlock" && isPracticing == false && mazenum < 21) //regular next block
-            {
-
-                if (mazenum != 10)
-                {
-                    BreakButton.SetActive(false);
-                    LearningPhase();
-                    hasTriggered = false;
-                    
-
-                    GetSelectedRating();
-                    mazenum += 1;
-                    mapLoader.LoadNewMaze();
-                    enter=false;
-                    return;
-                }
-                else if(mazenum == 10)
-                {
-                    BreakButton.SetActive(true);
-                    takeAbreak();
-                    hasTriggered = false;
-                   
-
-                    GetSelectedRating();
-
-                    mapLoader.LoadNewMaze();
-                    enter=false;
-                    return;
-                }
-                enter=false;
-                return;
-            }
-
-
-            if (nextpage == "PerformancePhase") //block starts
-            {
-                GetSelectedRating();
-                PerformancePhase();
-                hasTriggered = false;
-                
-                enter=false;
-                return;
-            }
+            // Resume after instruction screen
             if (nextpage == "resume")
             {
-                if (isLearning == true)
-                {
-                    nextpage = "JOL";
-                    
-                }
-                if (isPerforming == true)
-                {
-                    nextpage = "RCJ";
-                    
-                }
                 Resume();
-                hasTriggered = false;
-                player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
-                enter=false;
+                
                 return;
             }
-
-
         }
         if (isPaused == false)
         {
@@ -355,9 +318,10 @@ public class MazeEventSystem : MonoBehaviour
         }
         if (targetTime <= 0.0f)
         {
-            player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+     
             Pause();
             TimerEnd();
+            
         }
       
     }
@@ -377,7 +341,8 @@ public class MazeEventSystem : MonoBehaviour
             isPaused = false;
             
             UICanvas.SetActive(false);
-        
+            player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
+
 
     }
 
@@ -402,5 +367,15 @@ public class MazeEventSystem : MonoBehaviour
         UImage_Q.SetActive(true);
         Pause();
     }
+    void SaveAnswerToFile(string questionType, int mazeNumber, int rating)
+    {
+        string desktopPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+        string fileName = "MazeSurveyResults.txt";
+        string filePath = Path.Combine(desktopPath, fileName);
 
+        string entry = $"Maze {mazeNumber}, {questionType}: {rating}% at {System.DateTime.Now}\n";
+
+        File.AppendAllText(filePath, entry);
+        Debug.Log("Answer saved to file: " + filePath);
+    }
 }

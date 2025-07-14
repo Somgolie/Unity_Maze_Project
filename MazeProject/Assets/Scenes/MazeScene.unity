@@ -2160,6 +2160,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3381510400531992596, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: mapLoader
+      value: 
+      objectReference: {fileID: 2099520068}
+    - target: {fileID: 3381510400531992596, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: MazeSystem
+      value: 
+      objectReference: {fileID: 1578383268}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

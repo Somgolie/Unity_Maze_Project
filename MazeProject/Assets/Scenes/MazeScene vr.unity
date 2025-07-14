@@ -4896,6 +4896,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1429338372}
     - target: {fileID: 3381510400531992596, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3381510400531992596, guid: be8576b2eedf1514f93e19bdafc74b3c, type: 3}
       propertyPath: mapLoader
       value: 
       objectReference: {fileID: 130898361}
