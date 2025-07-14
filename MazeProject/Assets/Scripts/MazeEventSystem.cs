@@ -10,12 +10,13 @@ using UnityEngine.SceneManagement;
 public class MazeEventSystem : MonoBehaviour
 {
     public MapLoader mapLoader;
+    public GameObject mazeGroup;
 
     private string nextpage;
 
     private bool isPaused;
-    private bool isLearning=false;
-    private bool isPerforming=false;
+    private bool isLearning = false;
+    private bool isPerforming = false;
     private bool isPracticing = false;
     public int mazenum;//mazenum is the number of mazes the player has completed
     public int mazeindex;//mazeindex is the current maze completed(the current maze is saved just in case)
@@ -42,7 +43,7 @@ public class MazeEventSystem : MonoBehaviour
     private bool hasTriggered = false;
 
     List<int> PracPhaseList = new List<int> { 0, 1 };
-    List<int> MainPhaseList = new List<int> {};
+    List<int> MainPhaseList = new List<int> { };
     public GameObject UImage_Q;
     public GameObject UImage_I;
     public GameObject UICanvas;
@@ -58,7 +59,7 @@ public class MazeEventSystem : MonoBehaviour
     //if the maze was a learning maze the next maze is the same else pick a new maze  and mazenum+1
     void Start()
     {
-        enter=false;
+        enter = false;
         UImage_I = GameObject.FindGameObjectWithTag("UI_I");
         UImage_Q = GameObject.FindGameObjectWithTag("UI_Q");
         UICanvas = GameObject.FindGameObjectWithTag("UIcanvas");
@@ -80,7 +81,7 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void Start_PracticeMazeBlock()
     {
-        
+
         isPracticing = true;
         Debug.Log("Prac!");
         nextpage = "LearningPhase";
@@ -92,18 +93,19 @@ public class MazeEventSystem : MonoBehaviour
         rawImageI.texture = PracticeBlock;
         mapLoader.LoadPracticeMaze();
         Pause();
+        EnterVoid();
     }
     public void Start_MainMazeBlock()
     {
-        
+
         isPracticing = false;
         Debug.Log("Action!");
         nextpage = "LearningPhase";
 
-        
+
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-        
+
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = MainBlock;
         mapLoader.LoadNewMaze();
@@ -112,7 +114,7 @@ public class MazeEventSystem : MonoBehaviour
     }
     public void LearningPhase()
     {
-        Debug.Log("Learn! "+mazenum);
+        Debug.Log("Learn! " + mazenum);
         nextpage = "resume";
         isLearning = true;
         isPerforming = false;
@@ -130,7 +132,7 @@ public class MazeEventSystem : MonoBehaviour
     public void PerformancePhase()
     {
 
-        Debug.Log("Perform! "+mazenum);
+        Debug.Log("Perform! " + mazenum);
         nextpage = "resume";
         isLearning = false;
         isPerforming = true;
@@ -150,7 +152,7 @@ public class MazeEventSystem : MonoBehaviour
 
         UImage_I.SetActive(false);
         UImage_Q.SetActive(true);
-
+        EnterVoid();
         RawImage rawImageQ = UImage_Q.GetComponent<RawImage>();
         rawImageQ.texture = JOL;
         Pause();
@@ -162,7 +164,7 @@ public class MazeEventSystem : MonoBehaviour
 
         UImage_I.SetActive(false);
         UImage_Q.SetActive(true);
-
+        EnterVoid();
         RawImage rawImageQ = UImage_Q.GetComponent<RawImage>();
         rawImageQ.texture = RCJ;
         BreakButton.SetActive(true);
@@ -189,7 +191,7 @@ public class MazeEventSystem : MonoBehaviour
         if (!hasTriggered)
         {
             Pause();
-            
+
             if (isLearning)
             {
                 player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
@@ -207,7 +209,7 @@ public class MazeEventSystem : MonoBehaviour
                 RCJQuestion();
             }
 
-            
+
         }
     }
     public void TimerEnd()
@@ -233,23 +235,26 @@ public class MazeEventSystem : MonoBehaviour
                 RCJQuestion();
             }
 
-            
+
         }
     }
-     public void pressed_enter()
-     {
-         Debug.Log("enter");
-         if (!enter)
-         {
-             enter=true;
-         }
-         return;
-     }
+    public void pressed_enter()
+    {
+        Debug.Log("enter");
+        if (!enter)
+        {
+            enter = true;
+        }
+        return;
+    }
 
     public void Update()
     {
-        UICanvas.transform.position = player.transform.position + player.transform.forward * 0.5f;
-        Timer.transform.position = player.transform.position + player.transform.forward * 0.5f + Vector3.up * 0.32f+Vector3.left*0.3f;
+        Transform cam = Camera.main.transform;
+
+        UICanvas.transform.position = cam.position + cam.forward * 1.0f;
+        UICanvas.transform.rotation = Quaternion.LookRotation(cam.forward);
+        Timer.transform.position = player.transform.position + player.transform.forward * 0.2f + Vector3.up * 0.32f + Vector3.left * 0.3f;
 
         // if (Input.GetKeyDown(KeyCode.Return))
         // {
@@ -313,7 +318,7 @@ public class MazeEventSystem : MonoBehaviour
             if (nextpage == "resume")
             {
                 Resume();
-                
+
                 return;
             }
         }
@@ -324,40 +329,40 @@ public class MazeEventSystem : MonoBehaviour
         }
         if (targetTime <= 0.0f)
         {
-     
+
             Pause();
             TimerEnd();
-            
+
         }
-      
+
     }
     void updateTimer(float currentTime)
     {
         currentTime += 1;
         float minutes = Mathf.FloorToInt(currentTime / 60);
         float seconds = Mathf.FloorToInt(currentTime % 60);
-        TextMeshProUGUI TimeText= Timer.GetComponent<TextMeshProUGUI>();
-        TimeText.text = string.Format("{0:00} : {1:00}",minutes,seconds);
+        TextMeshProUGUI TimeText = Timer.GetComponent<TextMeshProUGUI>();
+        TimeText.text = string.Format("{0:00} : {1:00}", minutes, seconds);
     }
 
     public void Resume()
     {
 
-            Time.timeScale = 1f;
-            isPaused = false;
-            UICanvas.SetActive(false);
-            
+        Time.timeScale = 1f;
+        isPaused = false;
+        UICanvas.SetActive(false);
+        ExitVoid();
 
 
     }
 
     void Pause()
     {
-        
+
         Time.timeScale = 0f;
         isPaused = true;
 
-        UICanvas.SetActive (true);
+        UICanvas.SetActive(true);
     }
 
     public void takeAbreak()
@@ -382,5 +387,22 @@ public class MazeEventSystem : MonoBehaviour
 
         File.AppendAllText(filePath, entry);
         Debug.Log("Answer saved to file: " + filePath);
+    }
+    void EnterVoid()
+{
+        if (mazeGroup != null)
+        {
+            mazeGroup.SetActive(false);
+        }
+
+}
+
+    void ExitVoid()
+    {
+        if (mazeGroup != null)
+        {
+            mazeGroup.SetActive(true);
+        }
+
     }
 }

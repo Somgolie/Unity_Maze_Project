@@ -54,6 +54,7 @@ public class MapLoader : MonoBehaviour
     public Vector3 upwards;
     private int chesseCounter;
     private int wallcounter;
+    public GameObject mazeContainer;
     void LoadObjectData(TextAsset mapData)
     {
         Debug.Log("Load more objects  " + (modelPrefabs.Length));
@@ -288,6 +289,8 @@ public class MapLoader : MonoBehaviour
         int nextMazeIndex = GetRandomUnplayedMazeIndex();
         if (nextMazeIndex != -1)
         {
+            
+
             // Load the wall data for the selected maze
             TextAsset wallDataFile = wallFiles[nextMazeIndex];
             LoadWallData(wallDataFile);
@@ -363,115 +366,122 @@ public class MapLoader : MonoBehaviour
             LoadWallData(currentMazeFile);
         }*/
 
-    public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
+public void BuildWall(float x1, float y1, float x2, float y2, Material TexMaterial)
+{
+    wallcounter += 1;
+
+    // 1. Calculate midpoint in 3D
+    Vector3 startPos = new Vector3(x1, 0f, y1);
+    Vector3 endPos = new Vector3(x2, 0f, y2);
+    Vector3 midpoint = (startPos + endPos) / 2f;
+
+    // 2. Calculate length and angle
+    float length = Vector3.Distance(startPos, endPos);
+    float angleRad = Mathf.Atan2((y2 - y1), (x2 - x1));
+    float angleDeg = angleRad * Mathf.Rad2Deg;
+
+    // 3. Instantiate the wall
+    if (TexMaterial != WallWire)
     {
-        wallcounter += 1;
+        GameObject newWall = Instantiate(_wallPrefab, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
+        newWall.transform.SetParent(mazeContainer.transform, false);  // Parent to mazeContainer
 
-        // 1. Calculate midpoint in 3D
-        Vector3 startPos = new Vector3(x1, 0f, y1);
-        Vector3 endPos = new Vector3(x2, 0f, y2);
-        Vector3 midpoint = (startPos + endPos) / 2f;
+        // 4. Adjust the wall’s length
+        Vector3 scale = newWall.transform.localScale;
+        scale.x = length;  // Adjust the wall's scale
+        newWall.transform.localScale = scale;
 
-        // 2. Calculate length and angle
-        float length = Vector3.Distance(startPos, endPos);
-        float angleRad = Mathf.Atan2((y2 - y1), (x2 - x1));
-        float angleDeg = angleRad * Mathf.Rad2Deg;
-
-        // 3. Instantiate the wall
-        if (TexMaterial != WallWire)
+        if (TexMaterial == cheeseTexture)
         {
-            GameObject newWall = Instantiate(_wallPrefab, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-            // 4. Adjust the wall・s length
-            Vector3 scale = newWall.transform.localScale;
-            scale.x = length;  // Adjust the wall's scale
-            newWall.transform.localScale = scale;
+            chesseCounter += 1;
+            GameObject Finishline = Instantiate(_CheeseTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
+            Finishline.transform.SetParent(mazeContainer.transform, false);  // Parent to mazeContainer
+            Vector3 scale_cheese = Finishline.transform.localScale;
+            scale_cheese.x = length;
+            Finishline.transform.localScale = scale_cheese;
 
+            // Spawn moon at one of four fixed positions
+            if (Spawn_Moon == 1)
+            {
+                Vector3[] possiblePositions = new Vector3[]
+                {
+                    new Vector3(-10f, 8f, 6f),
+                    new Vector3(-6f, 8f, 10f),
+                    new Vector3(-4f, 8f, 10f),
+                    new Vector3(-10f, 8f, 4f)
+                };
+
+                int randomIndex = UnityEngine.Random.Range(0, possiblePositions.Length);
+                Vector3 spawnPos = possiblePositions[randomIndex];
+
+                Instantiate(moon, spawnPos, Quaternion.identity).transform.SetParent(mazeContainer.transform, false);
+                Spawn_Moon = 0;
+            }
+        }
+
+        // Apply the material to the wall
+        Renderer wallRenderer = newWall.GetComponentInChildren<MeshRenderer>();
+        if (wallRenderer != null)
+        {
+            wallRenderer.material = TexMaterial;
             if (TexMaterial == cheeseTexture)
             {
-                chesseCounter += 1;
-                GameObject Finishline = Instantiate(_CheeseTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-                Vector3 scale_cheese = Finishline.transform.localScale;
-                scale_cheese.x = length;
-                Finishline.transform.localScale = scale_cheese;
-
-                // Spawn moon at one of four fixed positions
-                if (Spawn_Moon == 1)
-                {
-                    Vector3[] possiblePositions = new Vector3[]
-                    {
-                        new Vector3(-10f, 8f, 6f),
-                        new Vector3(-6f, 8f, 10f),
-                        new Vector3(-4f, 8f, 10f),
-                        new Vector3(-10f, 8f, 4f)
-                    };
-
-                    int randomIndex = UnityEngine.Random.Range(0, possiblePositions.Length);
-                    Vector3 spawnPos = possiblePositions[randomIndex];
-
-                    Instantiate(moon, spawnPos, Quaternion.identity);
-                    Spawn_Moon = 0;
-                }
-
+                Vector3 gap = new Vector3(0, 0, 0.5f);
+                newWall.tag = "Cheese";
+                newWall.transform.localScale = newWall.transform.localScale + gap;
             }
-            // Apply the material to the wall
-            Renderer wallRenderer = newWall.GetComponentInChildren<MeshRenderer>();
-            if (wallRenderer != null)
+            if (wallcounter == 5)
             {
-                wallRenderer.material = TexMaterial;
-                if (TexMaterial == cheeseTexture )
-                {
-                    Vector3 gap = new Vector3(0, 0, 0.5f);
-                    newWall.tag = "Cheese";
-                    newWall.transform.localScale= newWall.transform.localScale + gap;
-                }
-                if (wallcounter == 5)
-                {
-                    Vector3 gap = new Vector3(1, 0, 0);
-                    newWall.transform.position= newWall.transform.position + gap;
-                }
-
-            }
-            else
-            {
-                if(newWall.tag == "Cheese")
-                {
-                    Vector3 gap = new Vector3(0, 0, 0.5f);
-                    newWall.tag = "Cheese";
-                    newWall.transform.localScale = newWall.transform.localScale + gap;
-                }
+                Vector3 gap = new Vector3(1, 0, 0);
+                newWall.transform.position = newWall.transform.position + gap;
             }
         }
-
-
-
-        if (TexMaterial == WallWire)
+        else
         {
-            GameObject Trigger = Instantiate(_WallTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
-            Vector3 scale_trip = Trigger.transform.localScale;
-            scale_trip.x = length;
-            Trigger.transform.localScale = scale_trip;
+            if (newWall.tag == "Cheese")
+            {
+                Vector3 gap = new Vector3(0, 0, 0.5f);
+                newWall.tag = "Cheese";
+                newWall.transform.localScale = newWall.transform.localScale + gap;
+            }
         }
-
     }
+    else if (TexMaterial == WallWire)
+    {
+        GameObject Trigger = Instantiate(_WallTripWire, midpoint, Quaternion.Euler(0f, angleDeg, 0f));
+        Trigger.transform.SetParent(mazeContainer.transform, false);  // Parent to mazeContainer
+        Vector3 scale_trip = Trigger.transform.localScale;
+        scale_trip.x = length;
+        Trigger.transform.localScale = scale_trip;
+    }
+}
+
     public void buildObjects(float x1, float y1, float x2, float y2, Material TexMaterial)
     {
 
     }
-    void DestroyExistingWalls()
+ void DestroyExistingWalls()
+{
+    // Destroy by tag (legacy cleanup)
+    string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object", "DistalObject" };
+    foreach (string tag in tagsToDelete)
     {
-        // Delete all GameObjects with the tags "Wall", "Cheese", or "WallTripWire"
-        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object","DistalObject" };
-
-        foreach (string tag in tagsToDelete)
+        GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag(tag);
+        foreach (GameObject obj in objectsToDestroy)
         {
-            GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag(tag);
-            foreach (GameObject obj in objectsToDestroy)
-            {
-                Destroy(obj); // Destroy each object found with the tag
-            }
+            Destroy(obj);
         }
-
     }
+
+
+    if (mazeContainer != null)
+    {
+        foreach (Transform child in mazeContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+}
 
     /*  public void LoadNextMaze()
       {

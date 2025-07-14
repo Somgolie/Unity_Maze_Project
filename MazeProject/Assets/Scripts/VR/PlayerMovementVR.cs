@@ -78,19 +78,43 @@ public class PlayerMovementVR : MonoBehaviour
         if (inputDevices.Count > 0) rightController = inputDevices[0];
     }
 
-    void MovePlayer()
+    // void MovePlayer()
+    // {
+    //     if (leftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 leftJoystickInput))
+    //     {
+    //         if (leftJoystickInput.magnitude > 0.1f)
+    //         {
+    //             Vector3 moveDirection = new Vector3(leftJoystickInput.x, 0, leftJoystickInput.y);
+    //             moveDirection = transform.TransformDirection(moveDirection);
+    //             rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
+    //         }
+    //     }
+    // }
+void MovePlayer()
+{
+    if (leftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 leftJoystickInput))
     {
-        if (leftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 leftJoystickInput))
+        if (leftJoystickInput.magnitude > 0.1f)
         {
-            if (leftJoystickInput.magnitude > 0.1f)
-            {
-                Vector3 moveDirection = new Vector3(leftJoystickInput.x, 0, leftJoystickInput.y);
-                moveDirection = transform.TransformDirection(moveDirection);
-                rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
-            }
+            // Get headset's forward and right direction
+            Transform cam = Camera.main.transform;
+            Vector3 forward = cam.forward;
+            Vector3 right = cam.right;
+
+            // Ignore vertical tilt
+            forward.y = 0;
+            right.y = 0;
+            forward.Normalize();
+            right.Normalize();
+
+            // Calculate movement direction
+            Vector3 moveDirection = forward * leftJoystickInput.y + right * leftJoystickInput.x;
+
+            // Apply movement
+            rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
         }
     }
-
+}
     void RotatePlayer()
     {
         if (rightController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 rightJoystickInput))
