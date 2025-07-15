@@ -7,8 +7,10 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.SceneManagement;
+
 public class MazeEventSystem : MonoBehaviour
 {
+    private string sessionFileName;
     public MapLoader mapLoader;
     public GameObject mazeGroup;
 
@@ -18,9 +20,10 @@ public class MazeEventSystem : MonoBehaviour
     private bool isLearning = false;
     private bool isPerforming = false;
     private bool isPracticing = false;
-    public int mazenum;//mazenum is the number of mazes the player has completed
-    public int mazeindex;//mazeindex is the current maze completed(the current maze is saved just in case)
-    //UI
+    public int mazenum;
+    public int mazeindex;
+
+
     [SerializeField]
     public TextAsset PracticeMaze;
 
@@ -28,7 +31,6 @@ public class MazeEventSystem : MonoBehaviour
     public Texture MainInstructions;
     [SerializeField]
     public Texture PracticeBlock;
-
     [SerializeField]
     public Texture LearningInstructions;
     [SerializeField]
@@ -50,13 +52,37 @@ public class MazeEventSystem : MonoBehaviour
     public GameObject player;
     public GameObject Timer;
 
+    public TMP_Text screenText;
     public GameObject BreakButton;
     public float targetTime;
 
     public ToggleGroup toggleGroup;
     public List<Toggle> toggles = new List<Toggle>();
     public bool enter;
-    //if the maze was a learning maze the next maze is the same else pick a new maze  and mazenum+1
+
+    private string userName = "DefaultUser";
+    
+    // NEW: Survey response class
+    [System.Serializable]
+    public class SurveyResponse
+    {
+        public int mazeNumber;
+        public string questionType;
+        public int rating;
+        public string timestamp;
+
+        public SurveyResponse(int mazeNumber, string questionType, int rating)
+        {
+            this.mazeNumber = mazeNumber;
+            this.questionType = questionType;
+            this.rating = rating;
+            this.timestamp = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+    }
+
+    // NEW: In-memory list of responses
+    private List<SurveyResponse> surveyResponses = new List<SurveyResponse>();
+
     void Start()
     {
         enter = false;
@@ -74,44 +100,40 @@ public class MazeEventSystem : MonoBehaviour
         UICanvas.GetComponent<Canvas>().worldCamera = Camera.main;
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = MainInstructions;
-
-        //MUST BE LOADED ONCE
+        sessionFileName = $"{userName}_JOL_RCJ_{System.DateTime.Now:yyyyMMdd_HHmmss}.csv"; // NEW
         mazenum = 0;
         Debug.Log(mazenum);
     }
+
     public void Start_PracticeMazeBlock()
     {
-
         isPracticing = true;
         Debug.Log("Prac!");
         nextpage = "LearningPhase";
 
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = PracticeBlock;
         mapLoader.LoadPracticeMaze();
         Pause();
         EnterVoid();
     }
+
     public void Start_MainMazeBlock()
     {
-
         isPracticing = false;
         Debug.Log("Action!");
         nextpage = "LearningPhase";
 
-
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = MainBlock;
         mapLoader.LoadNewMaze();
         Pause();
-
     }
+
     public void LearningPhase()
     {
         Debug.Log("Learn! " + mazenum);
@@ -120,18 +142,15 @@ public class MazeEventSystem : MonoBehaviour
         isPerforming = false;
         targetTime = 45.0f;
 
-
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = LearningInstructions;
-
         Pause();
     }
+
     public void PerformancePhase()
     {
-
         Debug.Log("Perform! " + mazenum);
         nextpage = "resume";
         isLearning = false;
@@ -140,16 +159,15 @@ public class MazeEventSystem : MonoBehaviour
 
         UImage_I.SetActive(true);
         UImage_Q.SetActive(false);
-
         RawImage rawImageI = UImage_I.GetComponent<RawImage>();
         rawImageI.texture = PerformanceInstructions;
         Pause();
     }
+
     public void JOLQuestion()
     {
         Debug.Log("JOL! " + mazenum);
         nextpage = "PerformancePhase";
-
         UImage_I.SetActive(false);
         UImage_Q.SetActive(true);
         EnterVoid();
@@ -157,11 +175,11 @@ public class MazeEventSystem : MonoBehaviour
         rawImageQ.texture = JOL;
         Pause();
     }
+
     public void RCJQuestion()
     {
         Debug.Log("RCJ! " + mazenum);
         nextpage = "NextBlock";
-
         UImage_I.SetActive(false);
         UImage_Q.SetActive(true);
         EnterVoid();
@@ -169,25 +187,27 @@ public class MazeEventSystem : MonoBehaviour
         rawImageQ.texture = RCJ;
         BreakButton.SetActive(true);
         Pause();
-
     }
+
     public int GetSelectedRating()
     {
         for (int i = 0; i < toggles.Count; i++)
         {
             if (toggles[i].isOn)
             {
-                int rating = i * 25; // 0%, 25%, 50%, 75%, 100%
+                int rating = i * 25;
                 Debug.Log("Selected Rating: " + rating + "%");
                 return rating;
             }
         }
 
         Debug.LogWarning("No rating selected.");
-        return -1; // or some sentinel value
+        return -1;
     }
+
     public void OnPlayerTouchedCheese()
     {
+        mazeindex=mapLoader.currentMazeIndex;
         if (!hasTriggered)
         {
             Pause();
@@ -208,12 +228,12 @@ public class MazeEventSystem : MonoBehaviour
                 hasTriggered = true;
                 RCJQuestion();
             }
-
-
         }
     }
+
     public void TimerEnd()
     {
+        mazeindex=mapLoader.currentMazeIndex;
         if (!hasTriggered)
         {
             Pause();
@@ -234,10 +254,9 @@ public class MazeEventSystem : MonoBehaviour
                 hasTriggered = true;
                 RCJQuestion();
             }
-
-
         }
     }
+
     public void pressed_enter()
     {
         Debug.Log("enter");
@@ -256,38 +275,40 @@ public class MazeEventSystem : MonoBehaviour
         UICanvas.transform.rotation = Quaternion.LookRotation(cam.forward);
         Timer.transform.position = player.transform.position + player.transform.forward * 0.2f + Vector3.up * 0.32f + Vector3.left * 0.3f;
 
-        // if (Input.GetKeyDown(KeyCode.Return))
-        // {
-        //     pressed_enter();
-        // }
-        // Enter
-        if (mazenum >= 20)
+        if (mazenum >= 1)
         {
-            takeAbreak();
-            Debug.Log("ALL MAZES COMPLETED");
+            takeAbreak();//replace with all mazes completed thank you
+            TextMeshProUGUI tmp = screenText.GetComponent<TextMeshProUGUI>();
+            if (tmp != null)
+            {
+                tmp.text = "all mazes completed thank you";
+            }
+            else
+            {
+                Debug.LogError("TextMeshProUGUI component not found on screenText!");
+            }
+            SaveAllResponsesToCSV(); //Save answers at the end
+
         }
-        //Input.GetKeyDown(KeyCode.Return))
+
         if (isPaused && enter)
         {
             enter = false;
 
-            // Player just finished JOL -> go to Performance
             if (nextpage == "PerformancePhase")
             {
-                SaveAnswerToFile("JOL", mazenum, GetSelectedRating());
+                RecordAnswerInMemory("JOL", mazeindex, GetSelectedRating());
                 hasTriggered = false;
                 PerformancePhase();
                 return;
             }
 
-            // Player just finished RCJ -> go to next learning or finish
             if (nextpage == "NextBlock")
             {
-                SaveAnswerToFile("RCJ", mazenum, GetSelectedRating());
+                RecordAnswerInMemory("RCJ", mazeindex, GetSelectedRating()); 
                 hasTriggered = false;
                 if (isPracticing)
                 {
-                    // End of practice block, start real
                     Start_MainMazeBlock();
                 }
                 else if (mazenum < 20)
@@ -298,15 +319,13 @@ public class MazeEventSystem : MonoBehaviour
                 }
                 else
                 {
-                    // All real mazes completed
                     takeAbreak();
+                    SaveAllResponsesToCSV(); // Save answers at the end
                     Debug.Log("ALL MAZES COMPLETED");
                 }
                 return;
             }
 
-
-            // Start learning
             if (nextpage == "LearningPhase")
             {
                 BreakButton.SetActive(false);
@@ -314,28 +333,26 @@ public class MazeEventSystem : MonoBehaviour
                 return;
             }
 
-            // Resume after instruction screen
             if (nextpage == "resume")
             {
                 Resume();
-
                 return;
             }
         }
-        if (isPaused == false)
+
+        if (!isPaused)
         {
             targetTime -= Time.deltaTime;
             updateTimer(targetTime);
         }
+
         if (targetTime <= 0.0f)
         {
-
             Pause();
             TimerEnd();
-
         }
-
     }
+
     void updateTimer(float currentTime)
     {
         currentTime += 1;
@@ -347,21 +364,16 @@ public class MazeEventSystem : MonoBehaviour
 
     public void Resume()
     {
-
         Time.timeScale = 1f;
         isPaused = false;
         UICanvas.SetActive(false);
         ExitVoid();
-
-
     }
 
     void Pause()
     {
-
         Time.timeScale = 0f;
         isPaused = true;
-
         UICanvas.SetActive(true);
     }
 
@@ -371,31 +383,52 @@ public class MazeEventSystem : MonoBehaviour
         UImage_Q.SetActive(false);
         Pause();
     }
+
     public void leavebreak()
     {
         UImage_I.SetActive(false);
         UImage_Q.SetActive(true);
         Pause();
     }
-    void SaveAnswerToFile(string questionType, int mazeNumber, int rating)
+
+    // Save answers into memory
+    void RecordAnswerInMemory(string questionType, int mazeNumber, int rating)
     {
-        string desktopPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-        string fileName = "MazeSurveyResults.txt";
-        string filePath = Path.Combine(desktopPath, fileName);
+        if (mazeNumber == 0 && isPracticing == true)
+        {
+            mazeNumber = -1;
+        }
 
-        string entry = $"Maze {mazeNumber}, {questionType}: {rating}% at {System.DateTime.Now}\n";
 
-        File.AppendAllText(filePath, entry);
-        Debug.Log("Answer saved to file: " + filePath);
+        surveyResponses.Add(new SurveyResponse(mazeNumber, questionType, rating));
     }
+
+    // Save all responses to CSV
+    void SaveAllResponsesToCSV()
+    {
+        string fileName = sessionFileName;
+        string filePath = Path.Combine(Application.persistentDataPath, fileName);
+
+        using (StreamWriter writer = new StreamWriter(filePath, false))
+        {
+            writer.WriteLine("MazeNumber,QuestionType,Rating,Timestamp");
+
+            foreach (var response in surveyResponses)
+            {
+                writer.WriteLine($"{response.mazeNumber},{response.questionType},{response.rating},{response.timestamp}");
+            }
+        }
+
+        Debug.Log("All responses saved to file: " + filePath);
+    }
+
     void EnterVoid()
-{
+    {
         if (mazeGroup != null)
         {
             mazeGroup.SetActive(false);
         }
-
-}
+    }
 
     void ExitVoid()
     {
@@ -403,6 +436,5 @@ public class MazeEventSystem : MonoBehaviour
         {
             mazeGroup.SetActive(true);
         }
-
     }
 }

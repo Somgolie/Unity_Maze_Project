@@ -290,13 +290,13 @@ public class MapLoader : MonoBehaviour
         if (nextMazeIndex != -1)
         {
             
-
+            
             // Load the wall data for the selected maze
             TextAsset wallDataFile = wallFiles[nextMazeIndex];
             LoadWallData(wallDataFile);
             LoadObjectData(wallDataFile);
 
-
+            currentMazeIndex = nextMazeIndex;
 
             // Place player at the origin (or desired spawn point)
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -460,28 +460,33 @@ public void BuildWall(float x1, float y1, float x2, float y2, Material TexMateri
     {
 
     }
- void DestroyExistingWalls()
-{
-    // Destroy by tag (legacy cleanup)
-    string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object", "DistalObject" };
-    foreach (string tag in tagsToDelete)
+    void DestroyExistingWalls()
     {
-        GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag(tag);
-        foreach (GameObject obj in objectsToDestroy)
+        // Destroy by tag (legacy cleanup)
+        string[] tagsToDelete = new string[] { "Wall", "Cheese", "WallTripWire", "Object", "DistalObject" };
+        foreach (string tag in tagsToDelete)
         {
-            Destroy(obj);
+            GameObject[] objectsToDestroy = GameObject.FindGameObjectsWithTag(tag);
+            foreach (GameObject obj in objectsToDestroy)
+            {
+                Destroy(obj);
+            }
         }
-    }
 
 
-    if (mazeContainer != null)
-    {
-        foreach (Transform child in mazeContainer.transform)
+        if (mazeContainer != null)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in mazeContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
         }
     }
-}
+    public int getcurrent()
+    {
+        Debug.Log("PRINT CURRENT"+currentMazeIndex);
+        return currentMazeIndex;
+    }
 
     /*  public void LoadNextMaze()
       {

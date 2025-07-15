@@ -1644,6 +1644,7 @@ MonoBehaviour:
   UICanvas: {fileID: 223013559}
   player: {fileID: 4784640175384707800}
   Timer: {fileID: 3808447}
+  screenText: {fileID: 1092294338}
   BreakButton: {fileID: 1081520338}
   targetTime: 0
   toggleGroup: {fileID: 2016632603}
@@ -4998,7 +4999,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4784640175384707800}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4e801fd5cfdcd24c8ea1470880492e5, type: 3}
   m_Name: 
