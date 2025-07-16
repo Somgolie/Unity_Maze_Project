@@ -55,6 +55,8 @@ public class MapLoader : MonoBehaviour
     private int chesseCounter;
     private int wallcounter;
     public GameObject mazeContainer;
+
+    public int sessionType; //0 = DISTAL ONLY    1=COMBINED
     void LoadObjectData(TextAsset mapData)
     {
         Debug.Log("Load more objects  " + (modelPrefabs.Length));
@@ -118,7 +120,7 @@ public class MapLoader : MonoBehaviour
     void SpawnPeripheralObject(float x, float y, float scale, float rotationAngle, string objFile)
     {
 
-
+        
         for (int i = 0; i < modelPrefabs.Length; i++)
         {
             String target = modelPrefabs[i].name;
@@ -237,7 +239,11 @@ public class MapLoader : MonoBehaviour
         wallDictionary.Clear();
         TextAsset wallDataFile = PracticeMaze;
         LoadWallData(wallDataFile);
-        LoadObjectData(wallDataFile);
+        if (sessionType == 1)
+        {
+            LoadObjectData(wallDataFile);
+        }
+       
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
@@ -294,7 +300,11 @@ public class MapLoader : MonoBehaviour
             // Load the wall data for the selected maze
             TextAsset wallDataFile = wallFiles[nextMazeIndex];
             LoadWallData(wallDataFile);
-            LoadObjectData(wallDataFile);
+            if (sessionType == 1)
+             {
+             LoadObjectData(wallDataFile);
+            }
+            
 
             currentMazeIndex = nextMazeIndex;
 
@@ -400,23 +410,24 @@ public void BuildWall(float x1, float y1, float x2, float y2, Material TexMateri
             scale_cheese.x = length;
             Finishline.transform.localScale = scale_cheese;
 
-            // Spawn moon at one of four fixed positions
+                // Spawn moon at one of four fixed positions
+            
             if (Spawn_Moon == 1)
-            {
-                Vector3[] possiblePositions = new Vector3[]
                 {
-                    new Vector3(-10f, 8f, 6f),
-                    new Vector3(-6f, 8f, 10f),
-                    new Vector3(-4f, 8f, 10f),
-                    new Vector3(-10f, 8f, 4f)
-                };
+                    Vector3[] possiblePositions = new Vector3[]
+                    {
+                    new Vector3(-4f, 7f, 1f),//-10,7,6
+                    new Vector3(16f, 7f, 1f),//-6,7,10
+                    new Vector3(16f, 7f, 10f),//-4,7,10
+                    new Vector3(-4f, 7f, 10f) //-10,7,4
+                    };
 
-                int randomIndex = UnityEngine.Random.Range(0, possiblePositions.Length);
-                Vector3 spawnPos = possiblePositions[randomIndex];
+                    int randomIndex = UnityEngine.Random.Range(0, possiblePositions.Length);
+                    Vector3 spawnPos = possiblePositions[randomIndex];
 
-                Instantiate(moon, spawnPos, Quaternion.identity).transform.SetParent(mazeContainer.transform, false);
-                Spawn_Moon = 0;
-            }
+                    Instantiate(moon, spawnPos, Quaternion.identity).transform.SetParent(mazeContainer.transform, false);
+                    Spawn_Moon = 0;
+                }
         }
 
         // Apply the material to the wall
@@ -514,7 +525,14 @@ public void BuildWall(float x1, float y1, float x2, float y2, Material TexMateri
           LoadNewMaze();
 
       }*/
-
+    public void CombinedStart()
+    {
+        sessionType = 1;
+    }
+    public void DistalStart()
+    {
+        sessionType = 0;
+    }
     void Update()
     {
 
