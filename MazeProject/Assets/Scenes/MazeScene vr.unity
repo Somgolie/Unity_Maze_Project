@@ -1662,7 +1662,7 @@ MonoBehaviour:
   TimeCanvas: {fileID: 65910236}
   chooseSessionType: {fileID: 364997147}
   resume_button: {fileID: 598887992}
-  break_point: 1
+  break_point: 2
 --- !u!1 &364997147
 GameObject:
   m_ObjectHideFlags: 0

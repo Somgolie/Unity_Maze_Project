@@ -340,6 +340,7 @@ public class MazeEventSystem : MonoBehaviour
                 }
                 else if (mazenum < 19)
                 {
+                    SaveAllResponsesToCSV(); // Save answers at the end
                     mazenum += 1;
                     mapLoader.LoadNewMaze();
                     LearningPhase();
