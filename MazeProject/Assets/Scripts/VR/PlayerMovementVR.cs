@@ -2,6 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.SceneManagement;
+using System;
+using System.Collections;
+using System.IO;
+using TMPro;
+using UnityEngine.UI;
+using UnityEngine;
 
 public class PlayerMovementVR : MonoBehaviour
 {
@@ -9,7 +15,9 @@ public class PlayerMovementVR : MonoBehaviour
     private float moveSpeed;
     private float rotationSpeed;
     public float gravity = 9.81f; // Gravity strength
-
+    public List<int> errors_made = new List<int>();
+    public int errors;
+    public int maze_no;
     private Rigidbody rb;
     private InputDevice leftController;
     private InputDevice rightController;
@@ -17,6 +25,8 @@ public class PlayerMovementVR : MonoBehaviour
     public MazeEventSystem MazeSystem;
     void Start()
     {
+        maze_no=0;
+        errors=0;
         rb = GetComponent<Rigidbody>();
 
         if (rb == null)
@@ -46,6 +56,9 @@ public class PlayerMovementVR : MonoBehaviour
         transform.position = new Vector3(1, 0.5f, 2);
     }
 
+    public List<int> get_errors(){
+        return errors_made;
+    }
     void Update()
     {
         if (!leftController.isValid || !rightController.isValid)
@@ -155,8 +168,13 @@ void MovePlayer()
 
                 Debug.Log("Player touched the trigger!");
                 MazeSystem.OnPlayerTouchedCheese();
-
             }
+            if (other.CompareTag("WallTripWire")) // Ensure the player has the correct tag
+            {   
+                Debug.Log("Player entered a deadend");
+                errors+=1;
+            }
+
         }
 
     // New method to handle UI interaction

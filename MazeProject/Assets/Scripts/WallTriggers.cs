@@ -5,10 +5,10 @@ public class WallTriggers : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) // Ensure the player has the correct tag
-        {
-            Debug.Log("Player entered a deadend");
-        }
+        //if (other.CompareTag("Player")) // Ensure the player has the correct tag
+        //{
+           // Debug.Log("Player entered a deadend");
+       // }
     }
 
     void LoadNextLevel()

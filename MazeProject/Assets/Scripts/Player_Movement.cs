@@ -15,7 +15,8 @@ public class Player_Movement : MonoBehaviour
     public float moveSpeed = 10f;
     public float movedrag;
     public Transform orientation;
-
+    int trigger_count;
+    public int errors_made;
     float horizontalInput;
     float verticalInput;
 
@@ -45,12 +46,13 @@ public class Player_Movement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         hasTriggered=false;
+        errors_made=0;
 
 
 
 
     }
-
+    
     public void returnback()
     {
         transform.position = new Vector3(0.7f, 0.7f, 0.7f);
@@ -67,7 +69,14 @@ public class Player_Movement : MonoBehaviour
 
         moveplayer();
     }
-
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("WallTripWire")) // Ensure the player has the correct tag
+        {   
+                Debug.Log("Player entered a deadend");
+                errors_made+=1;
+        }
+    }
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");

@@ -22,7 +22,7 @@ public class MazeEventSystem : MonoBehaviour
     private bool isPracticing = false;
     public int mazenum;
     public int mazeindex;
-
+    public int maze_no;
     public GameObject leftline;
     public GameObject rightline;
     [SerializeField]
@@ -67,8 +67,9 @@ public class MazeEventSystem : MonoBehaviour
     public GameObject chooseSessionType;
     
     public GameObject resume_button;
-
+    public Array errors_made;
     public int break_point;
+    public List<int> errors= new List<int>();
     // Survey response class
     [System.Serializable]
     public class SurveyResponse
@@ -77,13 +78,14 @@ public class MazeEventSystem : MonoBehaviour
         public string questionType;
         public int rating;
         public string timestamp;
-
-        public SurveyResponse(int mazeNumber, string questionType, int rating)
+        public int maze_errors;
+        public SurveyResponse(int mazeNumber, string questionType, int rating,int maze_errors)
         {
             this.mazeNumber = mazeNumber;
             this.questionType = questionType;
             this.rating = rating;
             this.timestamp = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            this.maze_errors=maze_errors;
         }
     }
 
@@ -103,7 +105,7 @@ public class MazeEventSystem : MonoBehaviour
             UImage_I = GameObject.FindGameObjectWithTag("UI_I");
             UImage_Q = GameObject.FindGameObjectWithTag("UI_Q");
             UICanvas = GameObject.FindGameObjectWithTag("UIcanvas");
-            player = GameObject.FindGameObjectWithTag("Player");
+            player = GameObject.FindWithTag("Player");
             Timer = GameObject.FindGameObjectWithTag("Timer");
             BreakButton = GameObject.FindGameObjectWithTag("BreakButton");
             player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
@@ -242,7 +244,12 @@ public class MazeEventSystem : MonoBehaviour
 
         public void OnPlayerTouchedCheese()
         {
+            
+            
+            
             mazeindex = mapLoader.currentMazeIndex;
+            
+
             if (!hasTriggered)
             {
                 Pause();
@@ -253,6 +260,8 @@ public class MazeEventSystem : MonoBehaviour
                     isLearning = false;
                     nextpage = "JOL";
                     hasTriggered = true;
+                                   errors.Add(player.GetComponent<PlayerMovementVR>().errors);
+                 player.GetComponent<PlayerMovementVR>().errors=0;
                     JOLQuestion();
                 }
                 else if (isPerforming)
@@ -261,6 +270,8 @@ public class MazeEventSystem : MonoBehaviour
                     isPerforming = false;
                     nextpage = "RCJ";
                     hasTriggered = true;
+                                   errors.Add(player.GetComponent<PlayerMovementVR>().errors);
+                 player.GetComponent<PlayerMovementVR>().errors=0;
                     RCJQuestion();
                 }
             }
@@ -268,17 +279,23 @@ public class MazeEventSystem : MonoBehaviour
 
         public void TimerEnd()
         {
+            
+
             mazeindex = mapLoader.currentMazeIndex;
+
+            
             if (!hasTriggered)
             {
                 Pause();
-
+ 
                 if (isLearning)
                 {
                     player.transform.position = new Vector3(0.7f, 0.7f, 0.7f);
                     isLearning = false;
                     nextpage = "JOL";
                     hasTriggered = true;
+                    errors.Add(player.GetComponent<PlayerMovementVR>().errors);
+                    player.GetComponent<PlayerMovementVR>().errors=0;
                     JOLQuestion();
                 }
                 else if (isPerforming)
@@ -287,6 +304,8 @@ public class MazeEventSystem : MonoBehaviour
                     isPerforming = false;
                     nextpage = "RCJ";
                     hasTriggered = true;
+                    errors.Add(player.GetComponent<PlayerMovementVR>().errors);
+                    player.GetComponent<PlayerMovementVR>().errors=0;
                     RCJQuestion();
                 }
             }
@@ -410,7 +429,6 @@ public class MazeEventSystem : MonoBehaviour
             isPaused = false;
             UICanvas.SetActive(false);
             removeLines();
-        
             ExitVoid();
         }
 
@@ -459,13 +477,14 @@ public class MazeEventSystem : MonoBehaviour
         // Save answers into memory
         void RecordAnswerInMemory(string questionType, int mazeNumber, int rating)
         {
+            
             if (mazeNumber == 0 && isPracticing == true)
             {
                 mazeNumber = -1;
             }
-
-
-            surveyResponses.Add(new SurveyResponse(mazeNumber, questionType, rating));
+            surveyResponses.Add(new SurveyResponse(mazeNumber, questionType, rating,errors[maze_no]));
+            Debug.Log("ERRORS:"+errors[maze_no]);
+            maze_no+=1;
         }
 
         // Save all responses to CSV
@@ -476,7 +495,7 @@ public class MazeEventSystem : MonoBehaviour
 
             using (StreamWriter writer = new StreamWriter(filePath, false))
             {
-                writer.WriteLine("MazeNumber,QuestionType,Rating,Timestamp");
+                writer.WriteLine("MazeNumber,Condition,QuestionType,Rating,Timestamp,#Errors");
             if (mapLoader.sessionType == 0)
             {
                 writer.WriteLine("SESSION TYPE: DISTAL CUES ONLY");
@@ -485,20 +504,22 @@ public class MazeEventSystem : MonoBehaviour
             {
                 writer.WriteLine("SESSION TYPE: COMBINED");  
             }
-                foreach (var response in surveyResponses)
+            int error_count=0;
+            foreach (var response in surveyResponses)
             {
                 if (response.mazeNumber == -1)
                 {
-                    writer.WriteLine($"Practice_Maze: ,{response.questionType},{response.rating},{response.timestamp}");
+                    writer.WriteLine($"Practice_Maze: ,{mapLoader.sessionType},{response.questionType},{response.rating},{response.timestamp}");
                 }
                 else
                 {
-                    writer.WriteLine($"Maze#: {response.mazeNumber},{response.questionType},{response.rating},{response.timestamp}");
-                }
-                
-            }
-            }
 
+                    writer.WriteLine($"Maze#: {response.mazeNumber},{mapLoader.sessionType},{response.questionType},{response.rating},{response.timestamp},{response.maze_errors}");
+                    error_count+=1;
+                }
+
+            }
+            }
             Debug.Log("All responses saved to file: " + filePath);
         }
 

@@ -1630,6 +1630,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapLoader: {fileID: 130898361}
   mazeGroup: {fileID: 1294256677}
+  player_info: {fileID: 4784640175384707800}
   mazenum: 0
   mazeindex: 0
   leftline: {fileID: 1963630319}
